@@ -1,0 +1,27 @@
+{
+  "name": "autohotkey-generator",
+  "version": "1.0.0",
+  "description": "AutoHotkey Generator is a web application that creates automation scripts from plain English descriptions using AI, with a React frontend and an Express backend.",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "autohotkey",
+    "automation",
+    "ai",
+    "script-generation",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "AutoHotkey Generator Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
