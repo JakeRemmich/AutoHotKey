@@ -5,11 +5,13 @@ const connectDB = async () => {
     console.log('Connecting to MongoDB...');
     console.log('Database URL:', process.env.MONGODB_URI ? 'Set' : 'Not set');
 
+    console.log(process.env.MONGODB_URI);
     if (!process.env.MONGODB_URI) {
+
       throw new Error('DATABASE_URL is not set in environment variables');
     }
 
-    const conn = await mongoose.connect(process.env.DATABASE_URL);
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     console.log(`Database Name: ${conn.connection.name}`);
   } catch (error) {
