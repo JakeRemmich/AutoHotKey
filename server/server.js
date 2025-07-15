@@ -12,7 +12,7 @@ const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const { connectDB } = require("./config/database");
 const cors = require("cors");
 
-if (!process.env.DATABASE_URL) {
+if (!process.env.MONGODB_URI) {
   console.error("Error: DATABASE_URL variables in .env missing.");
   process.exit(-1);
 }
