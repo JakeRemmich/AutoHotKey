@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/',
+  baseURL: 'https://auto-hot-key-rzo3.vercel.app/',
   timeout: 10000,
 });
 
@@ -32,10 +32,10 @@ api.interceptors.response.use(
 
     // If the error is 401 or 403 and we haven't already tried to refresh
     // and it's not an auth endpoint (login/register/refresh)
-    if ((error.response?.status === 401 || error.response?.status === 403) && 
-        !originalRequest._retry && 
-        !isAuthEndpoint) {
-      
+    if ((error.response?.status === 401 || error.response?.status === 403) &&
+      !originalRequest._retry &&
+      !isAuthEndpoint) {
+
       originalRequest._retry = true;
 
       console.log('=== TOKEN REFRESH ATTEMPT ===');
