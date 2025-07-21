@@ -21,37 +21,52 @@ function App() {
   console.log('=== APP COMPONENT RENDER ===')
   console.log('Routes being registered...')
   console.log('=== END APP COMPONENT RENDER ===')
-  
+
   return (
-  <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/instructions" element={<Instructions />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/privacy-policy" element={
-            <div>
-              {console.log('=== PRIVACY POLICY ROUTE MATCHED ===')}
-              <PrivacyPolicy />
-            </div>
-          } />
-          <Route path="/terms-of-service" element={
-            <div>
-              {console.log('=== TERMS OF SERVICE ROUTE MATCHED ===')}
-              <TermsOfService />
-            </div>
-          } />
-          <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute><Layout><History /></Layout></ProtectedRoute>} />
-          <Route path="/account-settings" element={<ProtectedRoute><Layout><AccountSettings /></Layout></ProtectedRoute>} />
-          <Route path="/admin" element={<AdminRoute><Layout><Admin /></Layout></AdminRoute>} />
-          <Route path="*" element={<BlankPage />} />
-        </Routes>
-      </Router>
-      <Toaster />
-  </AuthProvider>
+    <AuthProvider>
+      <>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/instructions" element={<Instructions />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/privacy-policy" element={
+              <div>
+                {console.log('=== PRIVACY POLICY ROUTE MATCHED ===')}
+                <PrivacyPolicy />
+              </div>
+            } />
+            <Route path="/terms-of-service" element={
+              <div>
+                {console.log('=== TERMS OF SERVICE ROUTE MATCHED ===')}
+                <TermsOfService />
+              </div>
+            } />
+            <Route path="/dashboard" element={
+              // <ProtectedRoute>
+              <Layout><Dashboard /></Layout>
+              // </ProtectedRoute>
+            } />
+            <Route path="/history" element={
+              // <ProtectedRoute>
+              <Layout><History /></Layout>
+              // </ProtectedRoute>
+            }
+            />
+            <Route path="/account-settings" element={
+              // <ProtectedRoute>
+              <Layout><AccountSettings /></Layout>
+              // </ProtectedRoute>
+            } />
+            <Route path="/admin" element={<AdminRoute><Layout><Admin /></Layout></AdminRoute>} />
+            <Route path="*" element={<BlankPage />} />
+          </Routes>
+        </Router>
+        <Toaster />
+      </>
+    </AuthProvider>
   )
 }
 

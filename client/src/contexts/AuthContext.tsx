@@ -22,20 +22,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     console.log('=== AUTH CONTEXT INITIALIZATION ===');
-    
+
     const accessToken = localStorage.getItem('accessToken');
     const userData = localStorage.getItem('userData');
-    
+
     console.log('Access token exists:', !!accessToken);
     console.log('Access token value:', accessToken ? `${accessToken.substring(0, 20)}...` : 'null');
     console.log('User data exists:', !!userData);
     console.log('User data value:', userData);
-    
+
     if (accessToken && userData) {
       try {
         const parsedUser = JSON.parse(userData);
         console.log('Parsed user data:', parsedUser);
-        
+
         setUser(parsedUser);
         setIsAuthenticated(true);
         console.log('User authenticated from localStorage');
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       console.log('No valid authentication data found in localStorage');
     }
-    
+
     setIsInitialized(true);
     console.log('AuthContext initialization complete');
     console.log('=== END AUTH CONTEXT INITIALIZATION ===');
@@ -65,11 +65,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       console.log('About to store tokens in localStorage...');
-      
+
       // Store tokens and user data
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('userData', JSON.stringify(user));
-      
+
       if (refreshToken) {
         localStorage.setItem('refreshToken', refreshToken);
       }
@@ -103,14 +103,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     console.log('=== AUTH CONTEXT LOGOUT ===');
-    
+
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userData');
-    
+
     setUser(null);
     setIsAuthenticated(false);
-    
+
     console.log('User logged out and localStorage cleared');
     console.log('=== END AUTH CONTEXT LOGOUT ===');
   };

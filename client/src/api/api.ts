@@ -78,9 +78,9 @@ api.interceptors.response.use(
           localStorage.removeItem('userData');
 
           // Only redirect if we're not already on the login page
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
-          }
+          // if (window.location.pathname !== '/login') {
+          //   window.location.href = '/login';
+          // }
 
           return Promise.reject(refreshError);
         }
@@ -94,9 +94,9 @@ api.interceptors.response.use(
         localStorage.removeItem('userData');
 
         // Only redirect if we're not already on the login page and it's a protected route
-        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-          window.location.href = '/login';
-        }
+        // if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        //   window.location.href = '/login';
+        // }
 
         return Promise.reject(error);
       }
