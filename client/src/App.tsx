@@ -60,7 +60,11 @@ function App() {
               <Layout><AccountSettings /></Layout>
               // </ProtectedRoute>
             } />
-            <Route path="/admin" element={<AdminRoute><Layout><Admin /></Layout></AdminRoute>} />
+            <Route path="/admin" element={
+              // <AdminRoute>
+              <Layout><Admin /></Layout>
+              // </AdminRoute>
+            } />
             <Route path="*" element={<BlankPage />} />
           </Routes>
         </Router>
