@@ -102,10 +102,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                                     </>
                                 }
 
-                                <MenuItem
-                                    onClick={handleLogout}
+                                {/* <MenuItem
+                                    // onClick={handleLogout}
                                     label="Logout"
-                                />
+                                /> */}
                             </>
                         ) : (
                             <>
