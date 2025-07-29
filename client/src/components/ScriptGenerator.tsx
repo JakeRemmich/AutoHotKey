@@ -54,7 +54,7 @@ export function ScriptGenerator({ onScriptGenerated, usage, onUpgradeClick }: Sc
     try {
       const result = await generateScript({ description }) as { script: string };
       console.log('Script generated successfully:', result.script.substring(0, 100) + '...');
-      
+
       setGeneratedScript(result.script);
       setScriptName(`Script ${new Date().toLocaleString()}`);
       onScriptGenerated();
@@ -170,14 +170,14 @@ export function ScriptGenerator({ onScriptGenerated, usage, onUpgradeClick }: Sc
             placeholder="Describe what you want to automate. For example: 'Create a hotkey Ctrl+Shift+T that opens Notepad and types Hello World'"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="min-h-[120px] resize-none border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+            className="placeholder:text-gray-400 min-h-[120px] resize-none border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
-          
+
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-500">
               {description.length}/1000 characters
             </div>
-            
+
             {canGenerate ? (
               <Button
                 onClick={handleGenerate}
@@ -235,7 +235,7 @@ export function ScriptGenerator({ onScriptGenerated, usage, onUpgradeClick }: Sc
                   className="border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   onClick={handleCopy}
@@ -245,7 +245,7 @@ export function ScriptGenerator({ onScriptGenerated, usage, onUpgradeClick }: Sc
                   <Copy className="h-4 w-4 mr-2" />
                   Copy
                 </Button>
-                
+
                 <Button
                   onClick={handleDownload}
                   variant="outline"
@@ -254,7 +254,7 @@ export function ScriptGenerator({ onScriptGenerated, usage, onUpgradeClick }: Sc
                   <Download className="h-4 w-4 mr-2" />
                   Download
                 </Button>
-                
+
                 <Button
                   onClick={handleSave}
                   disabled={isSaving || !scriptName.trim()}
