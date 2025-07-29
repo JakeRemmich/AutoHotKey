@@ -69,7 +69,7 @@ export function Instructions() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 py-12 xl:py-16">
       <div className="flex items-center gap-4">
         <Button
           onClick={() => navigate('/')}
@@ -267,13 +267,13 @@ export function Instructions() {
                   Copy
                 </Button>
               </div>
-              
+
               <div className="bg-gray-900 p-4 rounded mb-3">
                 <pre className="text-green-400 text-sm font-mono overflow-x-auto">
                   {script.code}
                 </pre>
               </div>
-              
+
               <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
                 <p className="text-sm text-blue-800">
                   <strong>How it works:</strong> {script.explanation}

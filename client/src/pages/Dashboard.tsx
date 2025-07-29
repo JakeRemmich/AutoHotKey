@@ -24,15 +24,15 @@ export function Dashboard() {
 
   useEffect(() => {
     loadUsage();
-    
+
     // Check for success parameter in URL
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
-    
+
     console.log('=== DASHBOARD URL PARAMS ===');
     console.log('Success param:', success);
     console.log('Canceled param:', canceled);
-    
+
     if (success === 'true') {
       console.log('Payment successful, showing success toast');
       toast({
@@ -40,11 +40,11 @@ export function Dashboard() {
         description: "You now have unlimited script generation.",
         duration: 5000
       });
-      
+
       // Remove the success parameter from URL
       searchParams.delete('success');
       setSearchParams(searchParams, { replace: true });
-      
+
       // Reload usage data to reflect the new subscription
       setTimeout(() => {
         loadUsage();
@@ -56,12 +56,12 @@ export function Dashboard() {
         description: "Your subscription upgrade was canceled.",
         variant: "destructive"
       });
-      
+
       // Remove the canceled parameter from URL
       searchParams.delete('canceled');
       setSearchParams(searchParams, { replace: true });
     }
-    
+
     console.log('=== END DASHBOARD URL PARAMS ===');
   }, [searchParams, setSearchParams, toast]);
 
@@ -103,7 +103,7 @@ export function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px] py-12 xl:py-16 px-6 md:px-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading dashboard...</p>
@@ -113,20 +113,20 @@ export function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 py-12 xl:py-16 px-6 md:px-12">
       {/* Upgrade Header for Free Users and Per-Script Users with No Credits */}
       {shouldShowUpgradeHeader() && (
         <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-6 md:flex-row flex-col">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                   <Crown className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                    {usage.plan === 'per-script' && (usage.credits || 0) === 0 
-                      ? 'No Credits Remaining' 
+                    {usage.plan === 'per-script' && (usage.credits || 0) === 0
+                      ? 'No Credits Remaining'
                       : 'Unlock Unlimited Script Generation'
                     }
                   </h3>
@@ -138,7 +138,7 @@ export function Dashboard() {
                   </p>
                 </div>
               </div>
-              <Button 
+              <Button
                 onClick={handleUpgradeClick}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 flex items-center space-x-2"
               >
@@ -150,7 +150,7 @@ export function Dashboard() {
         </Card>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between ">
         <div>
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">AutoHotkey Generator</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">

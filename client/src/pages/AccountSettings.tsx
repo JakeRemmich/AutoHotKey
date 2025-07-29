@@ -28,7 +28,7 @@ export function AccountSettings() {
         getSubscriptionStatus(),
         getUserUsage()
       ]);
-      
+
       setSubscriptionStatus(statusResult.data);
       setUserUsage(usageResult);
     } catch (error) {
@@ -92,12 +92,12 @@ export function AccountSettings() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 py-12 xl:py-16 px-6 md:px-12">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Account Settings</h1>
           <p className="text-gray-600 mt-2">Manage your subscription and account preferences</p>
         </div>
-        
+
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -109,7 +109,7 @@ export function AccountSettings() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6  py-12 xl:py-16 px-6 md:px-12">
       <div>
         <h1 className="text-3xl font-bold text-gray-800">Account Settings</h1>
         <p className="text-gray-600 mt-2">Manage your subscription and account preferences</p>
@@ -174,16 +174,16 @@ export function AccountSettings() {
             <label className="text-sm font-medium text-gray-600">Email Address</label>
             <p className="text-gray-800">{userUsage?.email}</p>
           </div>
-          
+
           <Separator />
-          
+
           <div>
             <label className="text-sm font-medium text-gray-600">Member Since</label>
             <p className="text-gray-800">
               {userUsage?.createdAt ? format(new Date(userUsage.createdAt), 'PPP') : 'N/A'}
             </p>
           </div>
-          
+
           <div>
             <label className="text-sm font-medium text-gray-600">Last Login</label>
             <p className="text-gray-800">
@@ -207,7 +207,7 @@ export function AccountSettings() {
               <p className="text-gray-600">
                 Cancel your subscription at any time. You'll continue to have access until your current billing period ends.
               </p>
-              
+
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" disabled={isCanceling}>

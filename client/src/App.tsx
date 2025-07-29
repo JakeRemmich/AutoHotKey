@@ -14,8 +14,9 @@ import { PrivacyPolicy } from "./pages/PrivacyPolicy"
 import { TermsOfService } from "./pages/TermsOfService"
 import { ProtectedRoute } from "./components/ProtectedRoute"
 import { AdminRoute } from "./components/AdminRoute"
-import { Layout } from "./components/Layout"
+import { Layout } from "./components/common/Layout"
 import { BlankPage } from "./pages/BlankPage"
+import ScrollToTop from "./utils/ScrollToTop"
 
 function App() {
   console.log('=== APP COMPONENT RENDER ===')
@@ -25,48 +26,50 @@ function App() {
   return (
     <AuthProvider>
       <>
+
         <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/instructions" element={<Instructions />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/privacy-policy" element={
-              <div>
-                {console.log('=== PRIVACY POLICY ROUTE MATCHED ===')}
-                <PrivacyPolicy />
-              </div>
-            } />
-            <Route path="/terms-of-service" element={
-              <div>
-                {console.log('=== TERMS OF SERVICE ROUTE MATCHED ===')}
-                <TermsOfService />
-              </div>
-            } />
-            <Route path="/dashboard" element={
-              // <ProtectedRoute>
-              <Layout><Dashboard /></Layout>
-              // </ProtectedRoute>
-            } />
-            <Route path="/history" element={
-              // <ProtectedRoute>
-              <Layout><History /></Layout>
-              // </ProtectedRoute>
-            }
-            />
-            <Route path="/account-settings" element={
-              // <ProtectedRoute>
-              <Layout><AccountSettings /></Layout>
-              // </ProtectedRoute>
-            } />
-            <Route path="/admin" element={
-              // <AdminRoute>
-              <Layout><Admin /></Layout>
-              // </AdminRoute>
-            } />
-            <Route path="*" element={<BlankPage />} />
-          </Routes>
+          <ScrollToTop />
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/instructions" element={<Instructions />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/privacy-policy" element={
+                <div>
+                  <PrivacyPolicy />
+                </div>
+              } />
+              <Route path="/terms-of-service" element={
+                <div>
+                  <TermsOfService />
+                </div>
+              } />
+              <Route path="/dashboard" element={
+                // <ProtectedRoute>
+                <Dashboard />
+                // </ProtectedRoute>
+              } />
+              <Route path="/history" element={
+                // <ProtectedRoute>
+                <History />
+                // </ProtectedRoute>
+              }
+              />
+              <Route path="/account-settings" element={
+                // <ProtectedRoute>
+                <AccountSettings />
+                // </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                // <AdminRoute>
+                <Admin />
+                // </AdminRoute>
+              } />
+              <Route path="*" element={<BlankPage />} />
+            </Routes>
+          </Layout>
         </Router>
         <Toaster />
       </>

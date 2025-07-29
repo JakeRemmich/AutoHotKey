@@ -131,7 +131,7 @@ export function History() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px]  py-12 xl:py-16 px-6 md:px-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading your scripts...</p>
@@ -141,7 +141,7 @@ export function History() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6  py-12 xl:py-16 px-6 md:px-12">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">My AutoHotkey Scripts</h1>

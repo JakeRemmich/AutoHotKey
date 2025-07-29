@@ -1,54 +1,18 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Check, Zap, Code, Download, History, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Footer } from '@/components/common/Footer';
 
 export function Home() {
   const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-2xl font-bold text-blue-600">
-              AutoHotkey Generator
-            </Link>
 
-            <div className="flex-1 flex justify-center">
-              <nav className="hidden md:flex items-center space-x-6">
-                <Link to="/instructions" className="text-gray-600 hover:text-gray-900">
-                  Instructions
-                </Link>
-                <Link to="/pricing" className="text-gray-600 hover:text-gray-900">
-                  Pricing
-                </Link>
-              </nav>
-            </div>
 
-            <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
-                <Button asChild>
-                  <Link to="/dashboard">Dashboard</Link>
-                </Button>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" asChild>
-                    <Link to="/login">Login</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link to="/register">Sign Up</Link>
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Hero Section */}
       <section className="py-20 px-4">
@@ -56,13 +20,13 @@ export function Home() {
           <Badge variant="secondary" className="mb-4">
             AI-Powered Automation
           </Badge>
-          
+
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Automate Your Windows Tasks in Seconds
           </h1>
-          
+
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Transform your ideas into powerful AutoHotkey scripts using plain English. 
+            Transform your ideas into powerful AutoHotkey scripts using plain English.
             No coding experience required - just describe what you want to automate.
           </p>
 
@@ -203,42 +167,6 @@ export function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">AutoHotkey Generator</h3>
-              <p className="text-gray-400">
-                Automate your Windows tasks with AI-powered AutoHotkey script generation.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/instructions" className="hover:text-white">Instructions</Link></li>
-                <li><Link to="/pricing" className="hover:text-white">Pricing</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Account</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/login" className="hover:text-white">Login</Link></li>
-                <li><Link to="/register" className="hover:text-white">Sign Up</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link></li>
-                <li><Link to="/terms-of-service" className="hover:text-white">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 AutoHotkey Generator. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
