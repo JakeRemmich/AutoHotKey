@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://auto-hot-key-rzo3.vercel.app/',
+  baseURL: 'http://localhost:5000',
   timeout: 10000,
 });
 

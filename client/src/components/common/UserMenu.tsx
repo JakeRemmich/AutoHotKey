@@ -58,10 +58,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                 <div className="flex gap-2 items-center">
 
                     {currentUser && <div className="bg-theme1 text-white rounded-3xl ">
-                        <Link to={currentUser.role === "customer" ? '/instructions' : '/ride-requests'}>
-                            <Button label={currentUser.role === "customer" ? "Instructions" : "Ride requests"}
-                                className="rounded-full" />
-                        </Link>
+
                     </div>}
                     <div onClick={toggleOpen} ref={menuRef}
                         className="sm:p-4 xs:p-3 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition">
@@ -92,12 +89,20 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                                     :
                                     <>
                                         <MenuItem
-                                            onClick={() => navigate("/ride-requests")}
-                                            label="Ride requests"
+                                            onClick={() => navigate("/dashboard")}
+                                            label="Dashboard"
                                         />
                                         <MenuItem
-                                            onClick={() => navigate("/accepted-rides")}
-                                            label="Accepted rides"
+                                            onClick={() => navigate("/instructions")}
+                                            label="Instructions"
+                                        />
+                                        <MenuItem
+                                            onClick={() => navigate("/pricing")}
+                                            label="Pricing"
+                                        />
+                                        <MenuItem
+                                            onClick={() => navigate("/pricing")}
+                                            label="Logout"
                                         />
                                     </>
                                 }

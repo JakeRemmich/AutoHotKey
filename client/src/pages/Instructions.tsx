@@ -69,16 +69,16 @@ export function Instructions() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 py-12 xl:py-16">
+    <div className="max-w-4xl mx-auto space-y-8 py-12 xl:py-16 px-4">
       <div className="flex items-center gap-4">
-        <Button
+        {/* <Button
           onClick={() => navigate('/')}
           variant="outline"
           className="border-blue-500 text-blue-600 hover:bg-blue-50"
         >
           <Home className="h-4 w-4 mr-2" />
           Back to Home
-        </Button>
+        </Button> */}
         <div>
           <h1 className="text-3xl font-bold text-gray-800">How to Use AutoHotkey Scripts</h1>
           <p className="text-gray-600 mt-1">Everything you need to know about running and using AutoHotkey</p>

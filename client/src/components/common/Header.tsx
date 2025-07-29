@@ -45,9 +45,24 @@ export function Header() {
 
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
-              <Button asChild>
-                <Link to="/dashboard">Dashboard</Link>
-              </Button>
+              <>
+                <div className="hidden md:flex items-center space-x-2">
+                  <Button asChild>
+                    <Link to="/dashboard">Dashboard</Link>
+                  </Button>
+                  <Button onClick={handleLogout}>
+                    Logout
+                  </Button>
+                </div>
+                <div className="sm:hidden flex flex-col gap-3">
+                  <div className="flex flex-row items-center justify-between w-full">
+                    <div className="flex items-center">
+
+                      <UserMenu currentUser={user} />
+                    </div>
+                  </div>
+                </div>
+              </>
             ) : (
               <div className="flex items-center space-x-2">
                 <div className="hidden md:flex items-center space-x-2">
