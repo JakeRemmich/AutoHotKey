@@ -24,8 +24,10 @@ app.enable('json spaces');
 // We want to be consistent with URL paths, so we enable strict routing
 app.enable('strict routing');
 
-app.use(cors({}));
-
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
 // IMPORTANT: Webhook route must be defined BEFORE express.json() middleware
 // because Stripe webhooks need raw body for signature verification
 app.use('/api/stripe-webhook', express.raw({ type: 'application/json' }), require('./routes/subscriptionRoutes'));
