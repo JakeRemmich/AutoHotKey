@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Input } from './ui/input';
@@ -26,9 +26,7 @@ export function ScriptGenerator({ onScriptGenerated, usage, onUpgradeClick }: Sc
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  console.log('=== SCRIPT GENERATOR RENDER ===');
-  console.log('Usage:', usage);
-  console.log('Generated script length:', generatedScript.length);
+
 
   const canGenerate = usage.plan !== 'free' || usage.scriptsGenerated < usage.limit;
 
@@ -53,7 +51,6 @@ export function ScriptGenerator({ onScriptGenerated, usage, onUpgradeClick }: Sc
 
     try {
       const result = await generateScript({ description }) as { script: string };
-      console.log('Script generated successfully:', result.script.substring(0, 100) + '...');
 
       setGeneratedScript(result.script);
       setScriptName(`Script ${new Date().toLocaleString()}`);
@@ -87,8 +84,7 @@ export function ScriptGenerator({ onScriptGenerated, usage, onUpgradeClick }: Sc
     }
 
     setIsSaving(true);
-    console.log('=== SAVING SCRIPT ===');
-    console.log('Script name:', scriptName);
+
 
     try {
       await saveScript({

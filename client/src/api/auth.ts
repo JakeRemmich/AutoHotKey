@@ -12,17 +12,17 @@ export const login = async (email: string, password: string) => {
     console.log('Making API call to /api/auth/login...');
     const response = await api.post('/api/auth/login', { email, password });
     console.log('API call completed successfully');
-    
+
     console.log('Login API response received:');
     console.log('- Response status:', response.status);
-    console.log('- Response data keys:', Object.keys(response.data));
-    console.log('- Success:', response.data.success);
-    console.log('- Has user:', !!response.data.user);
-    console.log('- Has access token:', !!response.data.accessToken);
-    console.log('- Has refresh token:', !!response.data.refreshToken);
-    console.log('- User object:', response.data.user);
-    console.log('- Access token length:', response.data.accessToken ? response.data.accessToken.length : 0);
-    console.log('- Refresh token length:', response.data.refreshToken ? response.data.refreshToken.length : 0);
+    // console.log('- Response data keys:', Object.keys(response.data));
+    // console.log('- Success:', response.data.success);
+    // console.log('- Has user:', !!response.data.user);
+    // console.log('- Has access token:', !!response.data.accessToken);
+    // console.log('- Has refresh token:', !!response.data.refreshToken);
+    // console.log('- User object:', response.data.user);
+    // console.log('- Access token length:', response.data.accessToken ? response.data.accessToken.length : 0);
+    // console.log('- Refresh token length:', response.data.refreshToken ? response.data.refreshToken.length : 0);
 
     if (response.data.success && response.data.accessToken) {
       console.log('Login successful, storing tokens in API layer...');
@@ -42,11 +42,6 @@ export const login = async (email: string, password: string) => {
     console.log('=== END API LOGIN REQUEST ===');
     return response.data;
   } catch (error) {
-    console.error('Login API error:', error);
-    console.error('Error response:', error?.response?.data);
-    console.error('Error status:', error?.response?.status);
-    console.error('Error message:', error?.response?.data?.message);
-    console.log('=== END API LOGIN REQUEST (ERROR) ===');
     throw new Error(error?.response?.data?.message || error.message);
   }
 };

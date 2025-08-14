@@ -232,7 +232,7 @@ AutoHotkey Script:`;
 // POST /api/scripts/save - Save generated script to user's history
 router.post('/save', requireUser, async (req, res) => {
   try {
-    const { name, description, script, originalDescription } = req.body;
+    const { name, description, script } = req.body;
     const userId = req.user.id;
 
     console.log(`=== SAVE SCRIPT REQUEST ===`);
@@ -256,20 +256,19 @@ router.post('/save', requireUser, async (req, res) => {
       });
     }
 
-    if (!originalDescription || typeof originalDescription !== 'string' || originalDescription.trim().length === 0) {
-      console.log('VALIDATION ERROR: Invalid original description provided');
-      return res.status(400).json({
-        success: false,
-        error: 'Original description is required'
-      });
-    }
+    // if (!originalDescription || typeof originalDescription !== 'string' || originalDescription.trim().length === 0) {
+    //   console.log('VALIDATION ERROR: Invalid original description provided');
+    //   return res.status(400).json({
+    //     success: false,
+    //     error: 'Original description is required'
+    //   });
+    // }
 
     // Create new script
     const newScript = new Script({
       name: name.trim(),
       description: description ? description.trim() : '',
       script: script.trim(),
-      originalDescription: originalDescription.trim(),
       userId: userId
     });
 

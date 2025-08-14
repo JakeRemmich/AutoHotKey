@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://auto-hot-key-rzo3.vercel.app',
+  baseURL: 'http://localhost:5000',
   timeout: 10000,
 });
 
@@ -47,11 +47,10 @@ api.interceptors.response.use(
           console.log('Attempting to refresh token...');
 
           // Create a new axios instance to avoid interceptor loops
-          const refreshResponse = await axios.post('/api/auth/refresh', {
+          const refreshResponse = await axios.post(`${api.defaults.baseURL}/api/auth/refresh`, {
             refreshToken: refreshToken
           });
 
-          console.log('Token refresh successful');
           const { accessToken, refreshToken: newRefreshToken } = refreshResponse.data;
 
           // Update tokens in localStorage
@@ -63,14 +62,11 @@ api.interceptors.response.use(
           // Update the original request with new token
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
-          console.log('Retrying original request with new token');
-          console.log('=== END TOKEN REFRESH ATTEMPT ===');
 
           // Retry the original request
           return api(originalRequest);
         } catch (refreshError) {
-          console.error('Token refresh failed:', refreshError);
-          console.log('=== END TOKEN REFRESH ATTEMPT (FAILED) ===');
+
 
           // Refresh failed, clear tokens and redirect to login
           localStorage.removeItem('accessToken');
@@ -85,10 +81,7 @@ api.interceptors.response.use(
           return Promise.reject(refreshError);
         }
       } else {
-        console.log('No refresh token available, clearing auth data');
-        console.log('=== END TOKEN REFRESH ATTEMPT (NO REFRESH TOKEN) ===');
 
-        // No refresh token, clear all auth data
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userData');

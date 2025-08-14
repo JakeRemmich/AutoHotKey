@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ScriptGenerator } from '@/components/ScriptGenerator';
 import { UsageCounter } from '@/components/UsageCounter';
 import { UpgradeModal } from '@/components/UpgradeModal';

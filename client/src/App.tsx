@@ -8,20 +8,16 @@ import { Dashboard } from "./pages/Dashboard"
 import { History } from "./pages/History"
 import { Instructions } from "./pages/Instructions"
 import { Pricing } from "./pages/Pricing"
-import { Admin } from "./pages/Admin"
 import { AccountSettings } from "./pages/AccountSettings"
 import { PrivacyPolicy } from "./pages/PrivacyPolicy"
 import { TermsOfService } from "./pages/TermsOfService"
 import { ProtectedRoute } from "./components/ProtectedRoute"
-import { AdminRoute } from "./components/AdminRoute"
 import { Layout } from "./components/common/Layout"
 import { BlankPage } from "./pages/BlankPage"
 import ScrollToTop from "./utils/ScrollToTop"
 
 function App() {
-  console.log('=== APP COMPONENT RENDER ===')
-  console.log('Routes being registered...')
-  console.log('=== END APP COMPONENT RENDER ===')
+
 
   return (
     <AuthProvider>

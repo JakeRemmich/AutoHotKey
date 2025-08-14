@@ -16,12 +16,7 @@ const scriptSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  originalDescription: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 1000
-  },
+
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

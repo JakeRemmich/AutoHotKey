@@ -17,7 +17,7 @@ export const generateScript = async (data: { description: string }) => {
 // Endpoint: POST /api/scripts/save
 // Request: { name: string, description: string, script: string, originalDescription: string }
 // Response: { success: boolean, scriptId: string }
-export const saveScript = async (data: { name: string; description: string; script: string; originalDescription: string }) => {
+export const saveScript = async (data: { name: string; description: string; script: string }) => {
   try {
     const response = await api.post('/api/scripts/save', data);
     return response.data;

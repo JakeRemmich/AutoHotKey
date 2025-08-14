@@ -8,7 +8,6 @@ import { getUserUsage } from '@/api/user';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/useToast';
 import { useNavigate } from 'react-router-dom';
-import { Layout } from '@/components/common/Layout';
 
 export function Pricing() {
   const [plans, setPlans] = useState([]);
