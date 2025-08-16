@@ -127,21 +127,22 @@ export function Pricing() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        {allPlans.map((plan: any, index: number) => {
+        {allPlans.map((plan: any) => {
           const isFree = plan._id === 'free';
           const isPerScript = plan.planType === 'per-script';
           const isMonthly = plan.planType === 'monthly';
-          const isUserCurrentPlan = isFree ? isFreePlan() : isCurrentPlan(plan.planType);
+          const isUserCurrentPlan = userUsage?.subscription_plan === plan.planType; // ✅ fixed
 
           return (
             <Card
               key={plan._id}
-              className={`border-2 hover:shadow-lg transition-all duration-300 ${isMonthly
-                ? 'border-blue-200 hover:border-blue-400 scale-105'
-                : isPerScript
-                  ? 'border-green-200 hover:border-green-400'
-                  : 'border-gray-200 hover:border-gray-400'
-                } ${isUserCurrentPlan ? 'ring-2 ring-blue-500' : ''}`}
+              className={`border-2 hover:shadow-lg transition-all duration-300
+              ${isMonthly
+                  ? 'border-blue-200 hover:border-blue-400 scale-105'
+                  : isPerScript
+                    ? 'border-green-200 hover:border-green-400'
+                    : 'border-gray-200 hover:border-gray-400'}
+               ${isUserCurrentPlan ? 'ring-2 ring-blue-500' : ''}`}
             >
               {isMonthly && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
