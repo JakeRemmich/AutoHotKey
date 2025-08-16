@@ -19,7 +19,6 @@ if (!process.env.MONGODB_URI) {
 
 const app = express();
 const port = process.env.PORT || 5000;
-// Pretty-print JSON responses
 app.enable('json spaces');
 // We want to be consistent with URL paths, so we enable strict routing
 app.enable('strict routing');
