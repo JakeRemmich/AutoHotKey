@@ -15,6 +15,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute"
 import { Layout } from "./components/common/Layout"
 import { BlankPage } from "./pages/BlankPage"
 import ScrollToTop from "./utils/ScrollToTop"
+import { AdminRoute } from "./components/AdminRoute"
+import { Admin } from "./pages/Admin"
 
 function App() {
 
@@ -58,6 +60,14 @@ function App() {
                   <AccountSettings />
                 </ProtectedRoute>
               } />
+
+              <Route path="/admin" element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
+              } />
+
+
 
               <Route path="*" element={<BlankPage />} />
             </Routes>

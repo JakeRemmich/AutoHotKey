@@ -6,16 +6,12 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, user } = useAuth();
-
-  console.log('=== PROTECTED ROUTE CHECK ===');
-  console.log('ProtectedRoute - isAuthenticated:', isAuthenticated);
-  console.log('ProtectedRoute - user:', user);
-  console.log('ProtectedRoute - localStorage accessToken exists:', !!localStorage.getItem('accessToken'));
-  console.log('ProtectedRoute - localStorage userData exists:', !!localStorage.getItem('userData'));
+  const { isAuthenticated } = useAuth();
 
   // Check localStorage directly as a fallback during initialization
   const hasTokens = localStorage.getItem('accessToken') && localStorage.getItem('userData');
+  console.log(isAuthenticated);
+  console.log(hasTokens);
 
   if (!isAuthenticated && !hasTokens) {
     console.log('ProtectedRoute - User not authenticated, redirecting to login');

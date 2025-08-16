@@ -91,21 +91,7 @@ export function Pricing() {
     );
   }
 
-  // Define the free plan
-  const freePlan = {
-    _id: 'free',
-    name: 'Free Plan',
-    description: 'Perfect for trying out AutoHotkey script generation',
-    price: 0,
-    interval: 'forever',
-    planType: 'free',
-    features: [
-      '3 free script generations',
-      'Basic AutoHotkey scripts',
-      'Download .ahk files',
-      'Community support'
-    ]
-  };
+
 
   // Sort plans: per-script first, then monthly
   const sortedPlans = [...plans].sort((a, b) => {
@@ -115,7 +101,7 @@ export function Pricing() {
   });
 
   // Combine free plan with sorted paid plans
-  const allPlans = [freePlan, ...sortedPlans];
+  const allPlans = [...sortedPlans];
 
   return (
     <div className="space-y-8  py-12 xl:py-16">
@@ -127,8 +113,8 @@ export function Pricing() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        {allPlans.map((plan: any, index: number) => {
-          const isFree = plan._id === 'free';
+        {allPlans.map((plan: any) => {
+          const isFree = plan.planType === 'free';
           const isPerScript = plan.planType === 'per-script';
           const isMonthly = plan.planType === 'monthly';
           const isUserCurrentPlan = isFree ? isFreePlan() : isCurrentPlan(plan.planType);
