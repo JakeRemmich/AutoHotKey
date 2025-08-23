@@ -13,7 +13,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   console.log(isAuthenticated);
   console.log(hasTokens);
 
-  if (!isAuthenticated && !hasTokens) {
+  if (!isAuthenticated || !hasTokens) {
     console.log('ProtectedRoute - User not authenticated, redirecting to login');
     console.log('=== END PROTECTED ROUTE CHECK ===');
     return <Navigate to="/login" replace />;

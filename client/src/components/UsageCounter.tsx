@@ -62,7 +62,7 @@ export function UsageCounter({ usage }: UsageCounterProps) {
   };
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+    <Card className="bg-white/80 z-0 border-0 shadow-lg">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">

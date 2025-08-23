@@ -173,10 +173,14 @@ router.post('/refresh', async (req, res) => {
 
     // Generate new access token
     const accessToken = generateAccessToken(user._id);
-
+    const newRefreshToken = generateRefreshToken(user._id);
+    user.refreshToken = newRefreshToken;
+    await user.save();
     res.json({
       success: true,
       accessToken,
+      refreshToken: newRefreshToken,
+
       user: {
         id: user._id,
         email: user.email,

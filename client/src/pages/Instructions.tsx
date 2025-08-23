@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Download, Play, Settings, Copy, ExternalLink, Home } from 'lucide-react';
+import { Copy, ExternalLink, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function Instructions() {
@@ -69,7 +69,7 @@ export function Instructions() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 py-12 xl:py-16 px-4">
+    <div className=" mx-auto space-y-8 py-12 xl:py-16 px-4">
       <div className="flex items-center gap-4">
         {/* <Button
           onClick={() => navigate('/')}
@@ -269,7 +269,7 @@ export function Instructions() {
               </div>
 
               <div className="bg-gray-900 p-4 rounded mb-3">
-                <pre className="text-green-400 text-sm font-mono overflow-x-auto">
+                <pre className="text-green-400 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-words">
                   {script.code}
                 </pre>
               </div>

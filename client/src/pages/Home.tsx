@@ -4,7 +4,6 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { Badge } from '@/components/ui/badge';
 import { Check, Zap, Code, Download, History, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Footer } from '@/components/common/Footer';
 
 export function Home() {
   const { isAuthenticated } = useAuth();

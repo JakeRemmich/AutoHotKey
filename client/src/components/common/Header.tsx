@@ -50,6 +50,12 @@ export function Header() {
                   <Button asChild>
                     <Link to="/dashboard">Dashboard</Link>
                   </Button>
+                  {user && user.role === "admin" && <Button asChild>
+                    <Link to="/admin">Admin</Link>
+                  </Button>}
+                  <Button asChild>
+                    <Link to="/account-settings">Account Settings</Link>
+                  </Button>
                   <Button onClick={handleLogout}>
                     Logout
                   </Button>
@@ -58,7 +64,7 @@ export function Header() {
                   <div className="flex flex-row items-center justify-between w-full">
                     <div className="flex items-center">
 
-                      <UserMenu currentUser={user} />
+                      <UserMenu />
                     </div>
                   </div>
                 </div>
@@ -77,7 +83,7 @@ export function Header() {
                   <div className="flex flex-row items-center justify-between w-full">
                     <div className="flex items-center">
 
-                      <UserMenu currentUser={user} />
+                      <UserMenu />
                     </div>
                   </div>
                 </div>

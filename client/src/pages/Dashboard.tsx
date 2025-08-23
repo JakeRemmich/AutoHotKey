@@ -116,7 +116,7 @@ export function Dashboard() {
     <div className="space-y-6 py-12 xl:py-16 px-6 md:px-12">
       {/* Upgrade Header for Free Users and Per-Script Users with No Credits */}
       {shouldShowUpgradeHeader() && (
-        <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+        <Card className="border-2 z-10 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
           <CardContent className="p-4">
             <div className="flex items-center justify-between gap-6 md:flex-row flex-col">
               <div className="flex items-center space-x-3">
