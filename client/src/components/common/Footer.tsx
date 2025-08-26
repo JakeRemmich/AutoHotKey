@@ -1,6 +1,8 @@
+import { useAuth } from "@/contexts/AuthContext"
 import { Link } from "react-router-dom"
 
 export function Footer() {
+  const { user, isAuthenticated } = useAuth()
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="container mx-auto">
@@ -21,8 +23,19 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Account</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><Link to="/login" className="hover:text-white">Login</Link></li>
-              <li><Link to="/register" className="hover:text-white">Sign Up</Link></li>
+              {user && isAuthenticated ?
+
+                <>
+                  <li><Link to="/dashboard" className="hover:text-white">Dashboard</Link></li>
+                  <li><Link to="/account-settings" className="hover:text-white">Account settigs</Link></li>
+                </>
+                :
+                <>
+                  <li><Link to="/login" className="hover:text-white">Login</Link></li>
+                  <li><Link to="/register" className="hover:text-white">Sign Up</Link></li>
+                </>
+
+              }
             </ul>
           </div>
           <div>

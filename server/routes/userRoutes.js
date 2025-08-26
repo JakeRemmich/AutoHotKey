@@ -33,7 +33,7 @@ router.get('/', requireUser, async (req, res) => {
       role: user.role,
       scriptsGenerated: user.scripts_generated_count,
       limit: limit,
-      plan: user.subscription_plan,
+      subscription_plan: user.subscription_plan,
       credits: user.credits || 0,
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt

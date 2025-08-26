@@ -13,76 +13,58 @@ export const login = async (email: string, password: string) => {
     const response = await api.post('/api/auth/login', { email, password });
     console.log('API call completed successfully');
 
-    console.log('Login API response received:');
-    console.log('- Response status:', response.status);
-    // console.log('- Response data keys:', Object.keys(response.data));
-    // console.log('- Success:', response.data.success);
-    // console.log('- Has user:', !!response.data.user);
-    // console.log('- Has access token:', !!response.data.accessToken);
-    // console.log('- Has refresh token:', !!response.data.refreshToken);
-    // console.log('- User object:', response.data.user);
-    // console.log('- Access token length:', response.data.accessToken ? response.data.accessToken.length : 0);
-    // console.log('- Refresh token length:', response.data.refreshToken ? response.data.refreshToken.length : 0);
+    const { success, user, accessToken, refreshToken } = response.data;
 
-    if (response.data.success && response.data.accessToken) {
-      console.log('Login successful, storing tokens in API layer...');
-
-      // Store tokens in localStorage
-      localStorage.setItem('accessToken', response.data.accessToken);
-      if (response.data.refreshToken) {
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-      }
-
-      // Verify storage immediately
-      const storedToken = localStorage.getItem('accessToken');
-      console.log('API layer - Token stored and verified:', !!storedToken);
-      console.log('API layer - Stored token matches response:', storedToken === response.data.accessToken);
+    if (!success || !accessToken || !user) {
+      throw new Error('Invalid login response format');
     }
+
+    console.log('Login API response validated:', {
+      success,
+      hasUser: !!user,
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken
+    });
 
     console.log('=== END API LOGIN REQUEST ===');
     return response.data;
-  } catch (error) {
-    throw new Error(error?.response?.data?.message || error.message);
+  } catch (error: any) {
+    console.error('Login API error:', error);
+    console.log('=== END API LOGIN REQUEST (ERROR) ===');
+    throw new Error(error?.response?.data?.message || error.message || 'Login failed');
   }
 };
 
 // Description: Register new user
 // Endpoint: POST /api/auth/register
 // Request: { email: string, password: string }
-// Response: { success: boolean, user: { id: string, email: string }, accessToken: string }
+// Response: { success: boolean, user: { id: string, email: string }, accessToken: string, refreshToken: string }
 export const register = async (email: string, password: string) => {
   console.log('=== API REGISTER REQUEST ===');
   console.log('Register attempt for email:', email);
 
   try {
     const response = await api.post('/api/auth/register', { email, password });
-    console.log('Register API response received:', {
-      success: response.data.success,
-      hasUser: !!response.data.user,
-      hasAccessToken: !!response.data.accessToken
-    });
 
-    if (response.data.success && response.data.accessToken) {
-      console.log('Registration successful, storing token...');
+    const { success, user, accessToken, refreshToken } = response.data;
 
-      // Store only access token for registration
-      localStorage.setItem('accessToken', response.data.accessToken);
-
-      // Verify storage immediately
-      const storedToken = localStorage.getItem('accessToken');
-      console.log('Token stored and verified:', !!storedToken);
-      console.log('Stored token matches response:', storedToken === response.data.accessToken);
+    if (!success || !accessToken || !user) {
+      throw new Error('Invalid registration response format');
     }
+
+    console.log('Register API response validated:', {
+      success,
+      hasUser: !!user,
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken
+    });
 
     console.log('=== END API REGISTER REQUEST ===');
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Register API error:', error);
-    console.error('Error response:', error?.response?.data);
-    console.error('Error status:', error?.response?.status);
-    console.error('Error message:', error?.response?.data?.message);
     console.log('=== END API REGISTER REQUEST (ERROR) ===');
-    throw new Error(error?.response?.data?.message || error.message);
+    throw new Error(error?.response?.data?.message || error.message || 'Registration failed');
   }
 };
 
@@ -97,27 +79,22 @@ export const logout = async () => {
   console.log('=== API LOGOUT REQUEST ===');
 
   try {
-    const response = await api.post('/api/auth/logout');
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    // Call logout endpoint with refresh token
+    const response = await api.post('/api/auth/logout', {
+      refreshToken
+    });
+
     console.log('Logout API response:', response.data);
-
-    // Clear localStorage
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userData');
-
-    console.log('LocalStorage cleared after logout');
     console.log('=== END API LOGOUT REQUEST ===');
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Logout API error:', error);
-
-    // Clear localStorage even if API call fails
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userData');
-
-    console.log('LocalStorage cleared after logout error');
     console.log('=== END API LOGOUT REQUEST (ERROR) ===');
-    throw new Error(error?.response?.data?.message || error.message);
+
+    // Don't throw error for logout - always succeed locally
+    // The server-side cleanup is best effort
+    return { success: true, message: 'Logged out locally' };
   }
 };

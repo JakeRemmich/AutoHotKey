@@ -1,25 +1,37 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isInitialized, clearAuth } = useAuth();
 
-  // Check localStorage directly as a fallback during initialization
-  const hasTokens = localStorage.getItem('accessToken') && localStorage.getItem('userData');
-  console.log(isAuthenticated);
-  console.log(hasTokens);
+  // Listen for auth cleared events from API layer
+  useEffect(() => {
+    const handleAuthCleared = () => {
+      console.log('ProtectedRoute: Received auth cleared event');
+      clearAuth();
+    };
 
-  if (!isAuthenticated || !hasTokens) {
-    console.log('ProtectedRoute - User not authenticated, redirecting to login');
-    console.log('=== END PROTECTED ROUTE CHECK ===');
+    window.addEventListener('authCleared', handleAuthCleared);
+    return () => window.removeEventListener('authCleared', handleAuthCleared);
+  }, [clearAuth]);
+
+  // Wait for auth context to initialize
+  if (!isInitialized) {
+    console.log('ProtectedRoute: Auth context not yet initialized');
+    return <div>Loading...</div>; // Or your loading component
+  }
+
+  // Check authentication state
+  if (!isAuthenticated) {
+    console.log('ProtectedRoute: User not authenticated, redirecting to login');
     return <Navigate to="/login" replace />;
   }
 
-  console.log('ProtectedRoute - User authenticated, rendering children');
-  console.log('=== END PROTECTED ROUTE CHECK ===');
+  console.log('ProtectedRoute: User authenticated, rendering children');
   return <>{children}</>;
 }

@@ -28,10 +28,13 @@ export function Pricing() {
         getSubscriptionPlans(),
         isAuthenticated ? getUserUsage() : Promise.resolve(null)
       ]);
+      console.log(usageResult, plansResult);
 
       setPlans(plansResult.data);
       if (usageResult) {
-        setUserUsage(usageResult.data);
+        console.log(usageResult);
+
+        setUserUsage(usageResult);
       }
     } catch (error) {
       toast({
@@ -72,7 +75,9 @@ export function Pricing() {
   };
 
   const isCurrentPlan = (planType: string) => {
+    console.log(userUsage, planType);
     if (!userUsage) return false;
+
     return userUsage.subscription_plan === planType;
   };
 
@@ -132,11 +137,12 @@ export function Pricing() {
           const isPerScript = plan.planType === 'per-script';
           const isMonthly = plan.planType === 'monthly';
           const isUserCurrentPlan = isFree ? isFreePlan() : isCurrentPlan(plan.planType);
+          console.log(isCurrentPlan(plan.planType));
 
           return (
             <Card
               key={plan._id}
-              className={`border-2 hover:shadow-lg transition-all duration-300 ${isMonthly
+              className={`border-2 relative hover:shadow-lg transition-all duration-300 ${isMonthly
                 ? 'border-blue-200 hover:border-blue-400 scale-105'
                 : isPerScript
                   ? 'border-green-200 hover:border-green-400'
@@ -149,7 +155,7 @@ export function Pricing() {
                 </div>
               )}
 
-              {isUserCurrentPlan && (
+              {isAuthenticated && isUserCurrentPlan && (
                 <div className="absolute -top-3 right-4">
                   <Badge className="bg-green-600 text-white px-3 py-1">Current Plan</Badge>
                 </div>

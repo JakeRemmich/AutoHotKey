@@ -17,6 +17,7 @@ import { BlankPage } from "./pages/BlankPage"
 import ScrollToTop from "./utils/ScrollToTop"
 import { AdminRoute } from "./components/AdminRoute"
 import { Admin } from "./pages/Admin"
+import { GuestRoute } from "./components/GuestRoute"
 
 function App() {
 
@@ -30,8 +31,17 @@ function App() {
           <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={
+                <GuestRoute>
+
+                  <Login />
+                </GuestRoute>
+              } />
+              <Route path="/register" element={
+                <GuestRoute>
+                  <Register />
+                </GuestRoute>
+              } />
               <Route path="/instructions" element={<Instructions />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/privacy-policy" element={

@@ -26,7 +26,7 @@ export function Header() {
   }, [navigate])
   return (
     <header className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="container mx-auto px-4 py-4">
+      <div className="mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold text-blue-600">
             AutoHotkey Generator
@@ -44,9 +44,9 @@ export function Header() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
+            {isAuthenticated && user ? (
               <>
-                <div className="hidden md:flex items-center space-x-2">
+                <div className="hidden lg:flex items-center space-x-2">
                   <Button asChild>
                     <Link to="/dashboard">Dashboard</Link>
                   </Button>
@@ -60,8 +60,8 @@ export function Header() {
                     Logout
                   </Button>
                 </div>
-                <div className="sm:hidden flex flex-col gap-3">
-                  <div className="flex flex-row items-center justify-between w-full">
+                <div className="lg:hidden flex flex-col gap-3">
+                  <div className="flex flex-row items-center justify-between">
                     <div className="flex items-center">
 
                       <UserMenu />

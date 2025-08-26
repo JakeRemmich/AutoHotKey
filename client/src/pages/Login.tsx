@@ -13,7 +13,7 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login: authLogin } = useAuth();
+  const { login: authLogin, } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,7 +52,7 @@ export function Login() {
           const storedAccessToken = localStorage.getItem('accessToken');
           const storedRefreshToken = localStorage.getItem('refreshToken');
           const storedUserData = localStorage.getItem('userData');
-          
+
           console.log('=== POST-LOGIN VERIFICATION ===');
           console.log('Stored access token exists:', !!storedAccessToken);
           console.log('Stored refresh token exists:', !!storedRefreshToken);
@@ -92,7 +92,7 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+    <div className="py-16 flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>

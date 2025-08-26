@@ -7,6 +7,8 @@ import api from './api';
 export const getUserUsage = async () => {
   try {
     const response = await api.get('/api/user');
+    console.log(response);
+
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message || error.message);
@@ -23,7 +25,7 @@ export const createCheckoutSession = async (data: { planType: 'monthly' | 'per-s
     const { getSubscriptionPlans } = await import('./subscriptions');
     const plansResponse = await getSubscriptionPlans();
     const plans = plansResponse.data;
-    
+
     // Find the plan that matches the requested type
     const plan = plans.find((p: any) => p.planType === data.planType);
     if (!plan) {

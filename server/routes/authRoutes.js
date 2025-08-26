@@ -47,8 +47,8 @@ router.post('/register', async (req, res) => {
     await user.save();
 
     // Generate tokens
-    const accessToken = generateAccessToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
+    const accessToken = generateAccessToken(user._id, res);
+    const refreshToken = generateRefreshToken(user._id, res);
 
     // Save refresh token to user
     user.refreshToken = refreshToken;
@@ -165,6 +165,7 @@ router.post('/refresh', async (req, res) => {
     // Find user and check if refresh token matches
     const user = await User.findById(decoded.userId);
     if (!user || user.refreshToken !== refreshToken) {
+      console.log(user.refreshToken, refreshToken)
       return res.status(401).json({
         success: false,
         message: 'Invalid refresh token'

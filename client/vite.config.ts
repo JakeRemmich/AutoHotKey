@@ -16,14 +16,10 @@ export default defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
-      '/logs': {
-        target: 'http://localhost:4444',
-        changeOrigin: true,
-      }
+
     },
     allowedHosts: [
       'localhost',
-      '.pythagora.ai'
     ],
     watch: {
       ignored: ['**/node_modules/**', '**/dist/**', '**/public/**', '**/log/**']

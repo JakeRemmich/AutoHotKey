@@ -19,9 +19,32 @@ export function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login: authLogin } = useAuth();
+
+  // Email validation function
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[A-Za-z0-9]([A-Za-z0-9._%-]*[A-Za-z0-9])?@[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?\.[A-Za-z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+  // Handle email input change with validation
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const emailValue = e.target.value;
+    setEmail(emailValue);
+
+    // Clear error when user starts typing
+    if (emailError) {
+      setEmailError('');
+    }
+
+    // Validate email if not empty
+    if (emailValue && !validateEmail(emailValue)) {
+      setEmailError('Please enter a valid email address');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +62,17 @@ export function Register() {
       return;
     }
 
+    // Validate email before submission
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast({
         title: "Error",
@@ -48,10 +82,10 @@ export function Register() {
       return;
     }
 
-    if (password.length < 6) {
+    if (!validatePassword(password)) {
       toast({
         title: "Error",
-        description: "Password must be at least 6 characters long",
+        description: "Password must contain at least one letter, one number, and one special character, and be at least 7 characters long",
         variant: "destructive"
       });
       return;
@@ -100,6 +134,12 @@ export function Register() {
     }
   };
 
+  const validatePassword = (password: string) => {
+    // Regular expression to match at least one letter, one number, and one special character
+    const regex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+    return regex.test(password);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
       <Card className="w-full max-w-md">
@@ -118,9 +158,13 @@ export function Register() {
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
                 required
+                className={emailError ? "border-red-500 focus-visible:ring-red-500" : ""}
               />
+              {emailError && (
+                <p className="text-sm text-red-500 mt-1">{emailError}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -147,7 +191,7 @@ export function Register() {
             <Button
               type="submit"
               className="w-full"
-              disabled={isLoading}
+              disabled={isLoading || !!emailError}
             >
               {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
