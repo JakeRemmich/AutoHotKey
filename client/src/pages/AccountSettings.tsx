@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { getSubscriptionStatus, cancelSubscription } from '@/api/subscriptions';
 import { getUserUsage } from '@/api/user';
 import { useToast } from '@/hooks/useToast';
 import { format } from 'date-fns';
+import { AccountSecuritySettings } from '@/components/AccountSecuritySettings';
 
 export function AccountSettings() {
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
@@ -28,7 +29,6 @@ export function AccountSettings() {
         getSubscriptionStatus(),
         getUserUsage()
       ]);
-
       setSubscriptionStatus(statusResult.data);
       setUserUsage(usageResult);
     } catch (error) {
@@ -63,7 +63,12 @@ export function AccountSettings() {
     }
   };
 
-  const getStatusBadgeVariant = (status) => {
+  const handleEmailUpdate = (newEmail: string) => {
+    // Update the local user data with new email
+    setUserUsage(prev => prev ? { ...prev, email: newEmail } : null);
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'active':
         return 'default';
@@ -77,7 +82,7 @@ export function AccountSettings() {
     }
   };
 
-  const getPlanDisplayName = (plan) => {
+  const getPlanDisplayName = (plan: string) => {
     switch (plan) {
       case 'free':
         return 'Free Plan';
@@ -97,7 +102,6 @@ export function AccountSettings() {
           <h1 className="text-3xl font-bold text-gray-800">Account Settings</h1>
           <p className="text-gray-600 mt-2">Manage your subscription and account preferences</p>
         </div>
-
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -109,7 +113,7 @@ export function AccountSettings() {
   }
 
   return (
-    <div className="space-y-6  py-12 xl:py-16 px-6 md:px-12">
+    <div className="space-y-6 py-12 xl:py-16 px-6 md:px-12">
       <div>
         <h1 className="text-3xl font-bold text-gray-800">Account Settings</h1>
         <p className="text-gray-600 mt-2">Manage your subscription and account preferences</p>
@@ -126,11 +130,11 @@ export function AccountSettings() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold">{getPlanDisplayName(userUsage?.plan)}</h3>
+              <h3 className="text-lg font-semibold">{getPlanDisplayName(userUsage?.subscription_plan)}</h3>
               <p className="text-gray-600">
-                {userUsage?.plan === 'free' && 'Limited to 3 script generations'}
-                {userUsage?.plan === 'monthly' && 'Unlimited script generations'}
-                {userUsage?.plan === 'per-script' && 'Pay per script generation'}
+                {userUsage?.subscription_plan === 'free' && 'Limited to 3 script generations'}
+                {userUsage?.subscription_plan === 'monthly' && 'Unlimited script generations'}
+                {userUsage?.subscription_plan === 'per-script' && 'Pay per script generation'}
               </p>
             </div>
             {subscriptionStatus?.status && (
@@ -139,8 +143,7 @@ export function AccountSettings() {
               </Badge>
             )}
           </div>
-
-          {userUsage?.plan === 'free' && (
+          {userUsage?.subscription_plan === 'free' && (
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="h-4 w-4 text-blue-600" />
@@ -151,7 +154,6 @@ export function AccountSettings() {
               </p>
             </div>
           )}
-
           {subscriptionStatus?.endDate && (
             <div className="flex items-center gap-2 text-gray-600">
               <Calendar className="h-4 w-4" />
@@ -174,16 +176,13 @@ export function AccountSettings() {
             <label className="text-sm font-medium text-gray-600">Email Address</label>
             <p className="text-gray-800">{userUsage?.email}</p>
           </div>
-
           <Separator />
-
           <div>
             <label className="text-sm font-medium text-gray-600">Member Since</label>
             <p className="text-gray-800">
               {userUsage?.createdAt ? format(new Date(userUsage.createdAt), 'PPP') : 'N/A'}
             </p>
           </div>
-
           <div>
             <label className="text-sm font-medium text-gray-600">Last Login</label>
             <p className="text-gray-800">
@@ -193,8 +192,16 @@ export function AccountSettings() {
         </CardContent>
       </Card>
 
+      {/* Security Settings Card */}
+      {userUsage?.email && (
+        <AccountSecuritySettings
+          userEmail={userUsage.email}
+          onEmailUpdate={handleEmailUpdate}
+        />
+      )}
+
       {/* Subscription Management Card */}
-      {userUsage?.plan !== 'free' && subscriptionStatus?.status === 'active' && (
+      {userUsage?.subscription_plan !== 'free' && subscriptionStatus?.status === 'active' && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -207,7 +214,6 @@ export function AccountSettings() {
               <p className="text-gray-600">
                 Cancel your subscription at any time. You'll continue to have access until your current billing period ends.
               </p>
-
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" disabled={isCanceling}>
@@ -244,7 +250,7 @@ export function AccountSettings() {
       )}
 
       {/* Upgrade Card for Free Users */}
-      {userUsage?.plan === 'free' && (
+      {userUsage?.subscription_plan === 'free' && (
         <Card className="border-blue-200">
           <CardHeader>
             <CardTitle className="text-blue-800">Upgrade Your Account</CardTitle>

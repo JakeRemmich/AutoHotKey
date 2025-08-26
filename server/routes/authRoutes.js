@@ -3,6 +3,8 @@ const bcryptjs = require('bcryptjs'); // Changed from 'bcrypt' to 'bcryptjs'
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { generateAccessToken, generateRefreshToken } = require('../utils/auth');
+const { requireUser } = require('./middleware/auth');
+const UserService = require('../services/userService');
 
 const router = express.Router();
 
@@ -225,6 +227,122 @@ router.post('/logout', async (req, res) => {
     res.json({
       success: true,
       message: 'Logout successful'
+    });
+  }
+});
+
+
+// PUT /api/auth/update-password
+router.put('/update-password', requireUser, async (req, res) => {
+  try {
+    console.log('Password update attempt for user:', req.body.userId);
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      console.log('Password update failed: Missing required fields');
+      return res.status(400).json({
+        success: false,
+        message: 'Current password, new password, and  are required'
+      });
+    }
+    const user = await UserService.get(req.user._id);
+
+    // Verify current password
+    const isValidCurrentPassword = await bcryptjs.compare(currentPassword, user.password);
+    if (!isValidCurrentPassword) {
+      console.log('Password update failed: Invalid current password for user:', user.email);
+      return res.status(401).json({
+        success: false,
+        message: 'Current password is incorrect'
+      });
+    }
+
+    // Hash new password
+    const saltRounds = 10;
+    const hashedNewPassword = await bcryptjs.hash(newPassword, saltRounds);
+
+    // Update password
+    user.password = hashedNewPassword;
+    await user.save();
+
+    console.log('Password updated successfully for user:', user.email);
+
+    res.json({
+      success: true,
+      message: 'Password updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Password update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during password update'
+    });
+  }
+});
+
+// PUT /api/auth/update-email
+router.put('/update-email', requireUser, async (req, res) => {
+  try {
+    console.log('Email update attempt for user:', req.body.userId);
+
+    const { newEmail, password } = req.body;
+
+    if (!newEmail || !password) {
+      console.log('Email update failed: Missing required fields');
+      return res.status(400).json({
+        success: false,
+        message: 'New email, password, and are required'
+      });
+    }
+
+    const user = await UserService.get(req.user._id);
+
+    // Verify password
+    const isValidPassword = await bcryptjs.compare(password, user.password);
+    if (!isValidPassword) {
+      console.log('Email update failed: Invalid password for user:', user.email);
+      return res.status(401).json({
+        success: false,
+        message: 'Password is incorrect'
+      });
+    }
+
+    // Check if new email already exists
+    const existingUser = await User.findOne({ email: newEmail.toLowerCase() });
+    if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+      console.log('Email update failed: Email already exists:', newEmail);
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists'
+      });
+    }
+
+    // Update email
+    const oldEmail = user.email;
+    user.email = newEmail.toLowerCase();
+    await user.save();
+
+    console.log('Email updated successfully from:', oldEmail, 'to:', user.email);
+
+    res.json({
+      success: true,
+      message: 'Email updated successfully',
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        subscription_plan: user.subscription_plan,
+        scripts_generated_count: user.scripts_generated_count
+      }
+    });
+
+  } catch (error) {
+    console.error('Email update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during email update'
     });
   }
 });

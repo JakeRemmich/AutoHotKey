@@ -14,6 +14,7 @@ export function Dashboard() {
     scriptsGenerated: 0,
     limit: 3,
     plan: 'free',
+    subscription_plan: 'free',
     credits: 0
   });
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);

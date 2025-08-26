@@ -8,11 +8,6 @@ import { useToast } from '@/hooks/useToast';
 import { register } from '@/api/auth';
 import { useAuth } from '@/contexts/AuthContext';
 
-type RegisterForm = {
-  email: string
-  password: string
-  confirmPassword: string
-}
 
 export function Register() {
   const [email, setEmail] = useState('');

@@ -98,3 +98,71 @@ export const logout = async () => {
     return { success: true, message: 'Logged out locally' };
   }
 };
+
+
+
+export const updatePassword = async (currentPassword: string, newPassword: string) => {
+  console.log('=== API UPDATE PASSWORD REQUEST ===');
+  console.log('Password update attempt for current user');
+
+  try {
+    console.log('Making API call to /api/auth/update-password...');
+    const response = await api.put('/api/auth/update-password', {
+      currentPassword,
+      newPassword
+    });
+    console.log('API call completed successfully');
+
+    const { success, message } = response.data;
+
+    if (!success) {
+      throw new Error(message || 'Password update failed');
+    }
+
+    console.log('Update password API response validated:', {
+      success,
+      message
+    });
+
+    console.log('=== END API UPDATE PASSWORD REQUEST ===');
+    return response.data;
+  } catch (error: any) {
+    console.error('Update password API error:', error);
+    console.log('=== END API UPDATE PASSWORD REQUEST (ERROR) ===');
+    throw new Error(error?.response?.data?.message || error.message || 'Password update failed');
+  }
+};
+
+
+export const updateEmail = async (newEmail: string, password: string) => {
+  console.log('=== API UPDATE EMAIL REQUEST ===');
+  console.log('Email update attempt for current user to:', newEmail);
+
+  try {
+    console.log('Making API call to /api/auth/update-email...');
+    const response = await api.put('/api/auth/update-email', {
+      newEmail,
+      password
+    });
+    console.log('API call completed successfully');
+
+    const { success, message, user } = response.data;
+
+    if (!success) {
+      throw new Error(message || 'Email update failed');
+    }
+
+    console.log('Update email API response validated:', {
+      success,
+      message,
+      hasUser: !!user
+    });
+
+    console.log('=== END API UPDATE EMAIL REQUEST ===');
+    return response.data;
+  } catch (error: any) {
+    console.error('Update email API error:', error);
+    console.log('=== END API UPDATE EMAIL REQUEST (ERROR) ===');
+    throw new Error(error?.response?.data?.message || error.message || 'Email update failed');
+  }
+}
