@@ -15,7 +15,7 @@ class StripeService {
   async createProduct(name, description) {
     try {
       console.log(`Creating Stripe product: ${name}`);
-      
+
       if (!this.stripe) {
         throw new Error('Stripe is not configured');
       }
@@ -37,7 +37,7 @@ class StripeService {
   async createPrice(productId, amount, currency = 'usd', interval = 'month') {
     try {
       console.log(`Creating Stripe price for product: ${productId}, amount: ${amount}`);
-      
+
       if (!this.stripe) {
         throw new Error('Stripe is not configured');
       }
@@ -65,7 +65,7 @@ class StripeService {
   async createCustomer(email, name = null) {
     try {
       console.log(`Creating Stripe customer for email: ${email}`);
-      
+
       if (!this.stripe) {
         throw new Error('Stripe is not configured');
       }
@@ -86,7 +86,7 @@ class StripeService {
   async createCheckoutSession(priceId, customerId, successUrl, cancelUrl, planType = 'monthly') {
     try {
       console.log(`Creating checkout session for price: ${priceId}, customer: ${customerId}`);
-      
+
       if (!this.stripe) {
         throw new Error('Stripe is not configured');
       }
@@ -119,13 +119,13 @@ class StripeService {
   async getSubscription(subscriptionId) {
     try {
       console.log(`Retrieving subscription: ${subscriptionId}`);
-      
+
       if (!this.stripe) {
         throw new Error('Stripe is not configured');
       }
 
       const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
-      
+
       console.log(`Successfully retrieved subscription: ${subscriptionId}`);
       return subscription;
     } catch (error) {
@@ -137,7 +137,7 @@ class StripeService {
   async cancelSubscription(subscriptionId) {
     try {
       console.log(`Canceling subscription: ${subscriptionId}`);
-      
+
       if (!this.stripe) {
         throw new Error('Stripe is not configured');
       }
@@ -153,6 +153,49 @@ class StripeService {
       throw error;
     }
   }
-}
 
+
+
+  async updateProduct(productId, name, description) {
+    try {
+      console.log(`Updating Stripe product: ${productId}`);
+
+      if (!this.stripe) {
+        throw new Error('Stripe is not configured');
+      }
+
+      const product = await this.stripe.products.update(productId, {
+        name,
+        description
+      });
+
+      console.log(`Successfully updated Stripe product: ${product.id}`);
+      return product;
+    } catch (error) {
+      console.error(`Error updating Stripe product: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async archiveProduct(productId) {
+    try {
+      console.log(`Archiving Stripe product: ${productId}`);
+
+      if (!this.stripe) {
+        throw new Error('Stripe is not configured');
+      }
+
+      const product = await this.stripe.products.update(productId, {
+        active: false
+      });
+
+      console.log(`Successfully archived Stripe product: ${product.id}`);
+      return product;
+    } catch (error) {
+      console.error(`Error archiving Stripe product: ${error.message}`);
+      throw error;
+    }
+  }
+
+}
 module.exports = new StripeService();

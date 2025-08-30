@@ -65,6 +65,87 @@ router.post('/subscription-plans', requireAdmin, async (req, res) => {
     });
   }
 });
+router.patch('/subscription-plans/:id', requireAdmin, async (req, res) => {
+  try {
+    console.log('Editing subscription plan');
+    const { id } = req.params;
+    const { name, description, price, interval, currency, features, planType } = req.body;
+
+    // Validate the plan exists
+    const existingPlan = await subscriptionService.getSubscriptionPlanById(id);
+    if (!existingPlan) {
+      return res.status(404).json({
+        success: false,
+        message: 'Subscription plan not found'
+      });
+    }
+
+    const planData = {
+      id,
+      name,
+      description,
+      price,
+      interval,
+      currency: currency || 'usd',
+      features,
+      planType
+    };
+
+    // Call the edit method instead of create
+    const updatedPlan = await subscriptionService.editSubscriptionPlan(planData);
+
+    return res.status(200).json({
+      success: true,
+      data: updatedPlan,
+      message: 'Subscription plan updated successfully'
+    });
+  } catch (error) {
+    console.error(`Error editing subscription plan: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to edit subscription plan',
+      error: error.message
+    });
+  }
+});
+router.delete('/subscription-plans/:id', requireAdmin, async (req, res) => {
+  try {
+    console.log('Deleting subscription plan');
+    const { id } = req.params;
+
+    // Validate the plan exists
+    const existingPlan = await subscriptionService.getSubscriptionPlanById(id);
+    if (!existingPlan) {
+      return res.status(404).json({
+        success: false,
+        message: 'Subscription plan not found'
+      });
+    }
+
+    // Check if plan has active subscriptions
+    const hasActiveSubscriptions = await subscriptionService.checkActiveSubscriptions(id);
+    if (hasActiveSubscriptions) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot delete subscription plan with active subscriptions. Please cancel all subscriptions first.'
+      });
+    }
+
+    await subscriptionService.deleteSubscriptionPlan(id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Subscription plan deleted successfully'
+    });
+  } catch (error) {
+    console.error(`Error deleting subscription plan: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete subscription plan',
+      error: error.message
+    });
+  }
+});
 
 // POST /api/checkout-sessions - Create Stripe checkout session
 router.post('/checkout-sessions', requireUser, async (req, res) => {
@@ -152,6 +233,7 @@ router.post('/stripe-webhook', async (req, res) => {
         console.log(JSON.stringify(session, null, 2));
         console.log('=== END FULL SESSION OBJECT ===');
 
+        const planId = session.metadata.planId
         // Find user by Stripe customer ID
         const user = await User.findOne({ stripeCustomerId: session.customer });
 
@@ -195,7 +277,8 @@ router.post('/stripe-webhook', async (req, res) => {
             planType: 'monthly',
             status: subscription.status,
             endDate: endDate,
-            stripeSubscriptionId: subscription.id
+            stripeSubscriptionId: subscription.id,
+            subscription_plan_id: planId
           });
 
           console.log(`Updated user ${user._id} with monthly subscription`);
@@ -210,7 +293,8 @@ router.post('/stripe-webhook', async (req, res) => {
             planType: 'per-script',
             status: 'active',
             endDate: null,
-            credits: 1 // This will be added to existing credits
+            credits: 1, // This will be added to existing credits
+            subscription_plan_id: planId
           });
 
           console.log(`Update result:`, updateResult);
@@ -219,23 +303,23 @@ router.post('/stripe-webhook', async (req, res) => {
           // Verify the update by fetching the user again
           const updatedUser = await User.findById(user._id);
           console.log(`User after update - plan: ${updatedUser.subscription_plan}, credits: ${updatedUser.credits}`);
-          
+
           // Additional verification: ensure credits were actually updated
           if (updatedUser.credits <= user.credits) {
             console.error(`CRITICAL ERROR: Credits were not properly added! Before: ${user.credits}, After: ${updatedUser.credits}`);
-            
+
             // Attempt manual credit update as fallback
             console.log(`Attempting manual credit update for user ${user._id}`);
             const manualUpdate = await User.findByIdAndUpdate(
-              user._id, 
-              { $inc: { credits: 1 } }, 
+              user._id,
+              { $inc: { credits: 1 } },
               { new: true }
             );
             console.log(`Manual update result - credits: ${manualUpdate.credits}`);
           } else {
             console.log(`SUCCESS: Credits properly updated from ${user.credits} to ${updatedUser.credits}`);
           }
-          
+
           console.log('=== END PROCESSING PER-SCRIPT PAYMENT ===');
         }
 

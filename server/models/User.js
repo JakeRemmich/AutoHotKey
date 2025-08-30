@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user'
   },
+  subscription_plan_id: { type: mongoose.Schema.Types.ObjectId, ref: 'SubscriptionPlan' },
   scripts_generated_count: {
     type: Number,
     default: 0

@@ -3,13 +3,27 @@ const User = require('../models/User');
 const stripeService = require('./stripeService');
 
 class SubscriptionService {
+  async getSubscriptionPlans(activeOnly = true) {
+    try {
+      console.log('Retrieving subscription plans');
+
+      const filter = activeOnly ? { isActive: true } : {};
+      const plans = await SubscriptionPlan.find(filter).sort({ price: 1 });
+
+      console.log(`Successfully retrieved ${plans.length} subscription plans`);
+      return plans;
+    } catch (error) {
+      console.error(`Error retrieving subscription plans: ${error.message}`);
+      throw error;
+    }
+  }
   async createSubscriptionPlan(planData) {
     try {
       console.log(`Creating subscription plan: ${planData.name}`);
 
       // Create product in Stripe
       const product = await stripeService.createProduct(planData.name, planData.description);
-      
+
       // Create price in Stripe
       const price = await stripeService.createPrice(
         product.id,
@@ -35,20 +49,191 @@ class SubscriptionService {
     }
   }
 
-  async getSubscriptionPlans(activeOnly = true) {
+  async hardDeleteSubscriptionPlan(planId) {
     try {
-      console.log('Retrieving subscription plans');
-      
-      const filter = activeOnly ? { isActive: true } : {};
-      const plans = await SubscriptionPlan.find(filter).sort({ price: 1 });
+      console.log(`Hard deleting subscription plan: ${planId}`);
 
-      console.log(`Successfully retrieved ${plans.length} subscription plans`);
-      return plans;
+      const existingPlan = await SubscriptionPlan.findById(planId);
+      if (!existingPlan) {
+        throw new Error('Subscription plan not found');
+      }
+
+      // WARNING: This will attempt to delete from Stripe
+      // This may fail if the product/price has been used
+      try {
+        if (existingPlan.stripePriceId) {
+          // Try to delete price - this will fail if it's been used
+          await stripeService.deletePrice(existingPlan.stripePriceId);
+        }
+      } catch (stripeError) {
+        console.warn(`Could not delete Stripe price: ${stripeError.message}`);
+        // Archive instead if deletion fails
+        await stripeService.archivePrice(existingPlan.stripePriceId);
+      }
+
+      try {
+        if (existingPlan.stripeProductId) {
+          // Try to delete product - this will fail if it has prices or has been used
+          await stripeService.deleteProduct(existingPlan.stripeProductId);
+        }
+      } catch (stripeError) {
+        console.warn(`Could not delete Stripe product: ${stripeError.message}`);
+        // Archive instead if deletion fails
+        await stripeService.archiveProduct(existingPlan.stripeProductId);
+      }
+
+      // Clean up related data in your database
+      await this.cleanupRelatedData(planId);
+
+      // Delete from database
+      await SubscriptionPlan.findByIdAndDelete(planId);
+
+      console.log(`Successfully hard deleted subscription plan: ${planId}`);
+      return { deleted: true };
     } catch (error) {
-      console.error(`Error retrieving subscription plans: ${error.message}`);
+      console.error(`Error hard deleting subscription plan: ${error.message}`);
       throw error;
     }
   }
+
+  async editSubscriptionPlan(planData) {
+    try {
+      console.log(`Editing subscription plan: ${planData.id}`);
+
+      // Get existing plan from database
+      const existingPlan = await SubscriptionPlan.findById(planData.id);
+      if (!existingPlan) {
+        throw new Error('Subscription plan not found');
+      }
+
+      // Check if we need to update Stripe product (name or description changed)
+      let stripeProductId = existingPlan.stripeProductId;
+      if (planData.name !== existingPlan.name || planData.description !== existingPlan.description) {
+        const updatedProduct = await stripeService.updateProduct(
+          existingPlan.stripeProductId,
+          planData.name,
+          planData.description
+        );
+        stripeProductId = updatedProduct.id;
+      }
+
+      // Check if we need to create new price (price, currency, or interval changed)
+      let stripePriceId = existingPlan.stripePriceId;
+      const priceChanged = planData.price !== existingPlan.price;
+      const currencyChanged = planData.currency !== existingPlan.currency;
+      const intervalChanged = planData.interval !== existingPlan.interval;
+
+      if (priceChanged || currencyChanged || intervalChanged) {
+        // Archive old price in Stripe
+        await stripeService.archivePrice(existingPlan.stripePriceId);
+
+        // Create new price
+        const newPrice = await stripeService.createPrice(
+          stripeProductId,
+          planData.price,
+          planData.currency,
+          planData.interval
+        );
+        stripePriceId = newPrice.id;
+      }
+
+      // Update plan in database
+      const updatedPlan = await SubscriptionPlan.findByIdAndUpdate(
+        planData.id,
+        {
+          name: planData.name,
+          description: planData.description,
+          price: planData.price,
+          interval: planData.interval,
+          currency: planData.currency,
+          features: planData.features,
+          planType: planData.planType,
+          stripeProductId,
+          stripePriceId,
+          updatedAt: new Date()
+        },
+        { new: true, runValidators: true }
+      );
+
+      console.log(`Successfully updated subscription plan: ${updatedPlan._id}`);
+      return updatedPlan;
+    } catch (error) {
+      console.error(`Error editing subscription plan: ${error.message}`);
+      throw error;
+    }
+  }
+  async deleteSubscriptionPlan(planId) {
+    try {
+      console.log(`Deleting subscription plan: ${planId}`);
+
+      // Get existing plan from database
+      const existingPlan = await SubscriptionPlan.findById(planId);
+      if (!existingPlan) {
+        throw new Error('Subscription plan not found');
+      }
+
+      // Archive Stripe price (make it inactive)
+      if (existingPlan.stripePriceId) {
+        await stripeService.archivePrice(existingPlan.stripePriceId);
+      }
+
+      // Archive Stripe product (make it inactive)
+      if (existingPlan.stripeProductId) {
+        await stripeService.archiveProduct(existingPlan.stripeProductId);
+      }
+
+      // Soft delete from database (mark as deleted instead of removing)
+      const deletedPlan = await SubscriptionPlan.findByIdAndUpdate(
+        planId,
+        {
+          isDeleted: true,
+          deletedAt: new Date(),
+          updatedAt: new Date()
+        },
+        { new: true }
+      );
+
+      // Alternative: Hard delete (completely remove from database)
+      // await SubscriptionPlan.findByIdAndDelete(planId);
+
+      console.log(`Successfully deleted subscription plan: ${planId}`);
+      return deletedPlan;
+    } catch (error) {
+      console.error(`Error deleting subscription plan: ${error.message}`);
+      throw error;
+    }
+  }
+
+  // Check if plan has active subscriptions
+  async checkActiveSubscriptions(planId) {
+    try {
+      // Assuming you have a Subscription model/collection
+      const activeSubscriptionCount = await SubscriptionPlan.countDocuments({
+        _id: planId,
+        isActive: true
+      });
+
+      return activeSubscriptionCount > 0;
+    } catch (error) {
+      console.error(`Error checking active subscriptions: ${error.message}`);
+      throw error;
+    }
+  }
+
+
+
+
+  async getSubscriptionPlanById(planId) {
+    try {
+      const plan = await SubscriptionPlan.findById(planId);
+      return plan;
+    } catch (error) {
+      console.error(`Error getting subscription plan: ${error.message}`);
+      throw error;
+    }
+  }
+
+
 
   async createCheckoutSession(userId, planId, successUrl, cancelUrl) {
     try {
@@ -122,6 +307,7 @@ class SubscriptionService {
 
       const updateData = {
         subscription_plan: subscriptionData.planType,
+        subscription_plan_id: subscriptionData.subscription_plan_id,
         subscriptionStatus: subscriptionData.status,
         subscriptionEndDate: subscriptionData.endDate
       };
