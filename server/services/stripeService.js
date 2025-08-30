@@ -197,5 +197,26 @@ class StripeService {
     }
   }
 
+  async archivePrice(priceId) {
+    try {
+      console.log(`Archiving Stripe price: ${priceId}`);
+
+      if (!this.stripe) {
+        throw new Error('Stripe is not configured');
+      }
+
+      const price = await this.stripe.prices.update(priceId, {
+        active: false
+      });
+
+      console.log(`Successfully archived Stripe price: ${price.id}`);
+      return price;
+    } catch (error) {
+      console.error(`Error archiving Stripe price: ${error.message}`);
+      throw error;
+    }
+  }
+
+
 }
 module.exports = new StripeService();

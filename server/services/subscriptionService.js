@@ -182,19 +182,8 @@ class SubscriptionService {
         await stripeService.archiveProduct(existingPlan.stripeProductId);
       }
 
-      // Soft delete from database (mark as deleted instead of removing)
-      const deletedPlan = await SubscriptionPlan.findByIdAndUpdate(
-        planId,
-        {
-          isDeleted: true,
-          deletedAt: new Date(),
-          updatedAt: new Date()
-        },
-        { new: true }
-      );
+      const deletedPlan = await SubscriptionPlan.findByIdAndDelete(planId);
 
-      // Alternative: Hard delete (completely remove from database)
-      // await SubscriptionPlan.findByIdAndDelete(planId);
 
       console.log(`Successfully deleted subscription plan: ${planId}`);
       return deletedPlan;
@@ -208,9 +197,9 @@ class SubscriptionService {
   async checkActiveSubscriptions(planId) {
     try {
       // Assuming you have a Subscription model/collection
-      const activeSubscriptionCount = await SubscriptionPlan.countDocuments({
-        _id: planId,
-        isActive: true
+      const activeSubscriptionCount = await User.countDocuments({
+        subscription_plan_id: planId,
+        subscriptionStatus: { $in: ["active", "past_due"] }
       });
 
       return activeSubscriptionCount > 0;
@@ -219,9 +208,6 @@ class SubscriptionService {
       throw error;
     }
   }
-
-
-
 
   async getSubscriptionPlanById(planId) {
     try {
