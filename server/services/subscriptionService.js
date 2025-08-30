@@ -266,6 +266,7 @@ class SubscriptionService {
 
       // Create checkout session
       const session = await stripeService.createCheckoutSession(
+        planId,
         plan.stripePriceId,
         customerId,
         successUrl,

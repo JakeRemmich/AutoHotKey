@@ -83,7 +83,7 @@ class StripeService {
     }
   }
 
-  async createCheckoutSession(priceId, customerId, successUrl, cancelUrl, planType = 'monthly') {
+  async createCheckoutSession(planId, priceId, customerId, successUrl, cancelUrl, planType = 'monthly') {
     try {
       console.log(`Creating checkout session for price: ${priceId}, customer: ${customerId}`);
 
@@ -102,7 +102,8 @@ class StripeService {
         success_url: successUrl,
         cancel_url: cancelUrl,
         metadata: {
-          planType
+          planType,
+          planId
         }
       };
 
