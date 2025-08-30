@@ -12,8 +12,8 @@ import { format } from 'date-fns';
 import { AccountSecuritySettings } from '@/components/AccountSecuritySettings';
 
 export function AccountSettings() {
-  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
-  const [userUsage, setUserUsage] = useState(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
+  const [userUsage, setUserUsage] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCanceling, setIsCanceling] = useState(false);
   const { toast } = useToast();
@@ -65,7 +65,7 @@ export function AccountSettings() {
 
   const handleEmailUpdate = (newEmail: string) => {
     // Update the local user data with new email
-    setUserUsage(prev => prev ? { ...prev, email: newEmail } : null);
+    setUserUsage((prev: any) => prev ? { ...prev, email: newEmail } : null);
   };
 
   const getStatusBadgeVariant = (status: string) => {

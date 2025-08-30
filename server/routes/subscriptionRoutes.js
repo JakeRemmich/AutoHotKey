@@ -69,7 +69,11 @@ router.patch('/subscription-plans/:id', requireAdmin, async (req, res) => {
   try {
     console.log('Editing subscription plan');
     const { id } = req.params;
-    const { name, description, price, interval, currency, features, planType } = req.body;
+    const { name, description, price,
+      interval,
+      currency, features,
+      //  planType
+    } = req.body;
 
     // Validate the plan exists
     const existingPlan = await subscriptionService.getSubscriptionPlanById(id);
@@ -88,7 +92,7 @@ router.patch('/subscription-plans/:id', requireAdmin, async (req, res) => {
       interval,
       currency: currency || 'usd',
       features,
-      planType
+      // planType
     };
 
     // Call the edit method instead of create

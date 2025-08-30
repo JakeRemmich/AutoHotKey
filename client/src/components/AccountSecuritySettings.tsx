@@ -252,7 +252,7 @@ export function AccountSecuritySettings({ userEmail, onEmailUpdate }: AccountSec
                             </div>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
+                                <Button
                                     onClick={handleEmailUpdate}
                                     disabled={isUpdatingEmail}
                                 >
@@ -264,7 +264,7 @@ export function AccountSecuritySettings({ userEmail, onEmailUpdate }: AccountSec
                                     ) : (
                                         'Update Email'
                                     )}
-                                </AlertDialogAction>
+                                </Button>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
@@ -376,7 +376,7 @@ export function AccountSecuritySettings({ userEmail, onEmailUpdate }: AccountSec
                             </div>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
+                                <Button
                                     onClick={handlePasswordUpdate}
                                     disabled={isUpdatingPassword}
                                 >
@@ -388,7 +388,7 @@ export function AccountSecuritySettings({ userEmail, onEmailUpdate }: AccountSec
                                     ) : (
                                         'Update Password'
                                     )}
-                                </AlertDialogAction>
+                                </Button>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>

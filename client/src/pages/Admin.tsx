@@ -6,15 +6,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Loader2, Crown, Zap } from 'lucide-react';
-import { getSubscriptionPlans, createSubscriptionPlan } from '@/api/subscriptions';
+import { Plus, Loader2, Crown, Zap, Edit2 } from 'lucide-react';
+import { getSubscriptionPlans, createSubscriptionPlan, deleteSubscriptionPlan, editSubscriptionPlan } from '@/api/subscriptions';
 import { useToast } from '@/hooks/useToast';
 
 export function Admin() {
     const [plans, setPlans] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isCreating, setIsCreating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
+    const [editingPlan, setEditingPlan] = useState<any>(null);
     const { toast } = useToast();
 
     const [formData, setFormData] = useState({
@@ -53,6 +56,54 @@ export function Admin() {
         }));
     };
 
+    const resetForm = () => {
+        setFormData({
+            name: '',
+            description: '',
+            price: '',
+            interval: 'month',
+            currency: 'usd',
+            features: '',
+            planType: 'monthly'
+        });
+        setEditingPlan(null);
+    };
+
+    const handleEdit = (plan: any) => {
+        setEditingPlan(plan);
+        setFormData({
+            name: plan.name,
+            description: plan.description,
+            price: plan.price.toString(),
+            interval: plan.interval,
+            currency: plan.currency,
+            features: plan.features.join('\n'),
+            planType: plan.planType
+        });
+        setShowCreateForm(true);
+    };
+
+    const handleDelete = async (id: string) => {
+        setIsDeleting(true);
+
+        try {
+            await deleteSubscriptionPlan(id);
+            toast({
+                title: "Success",
+                description: "Subscription plan deleted successfully"
+            });
+            await loadPlans();
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: error instanceof Error ? error.message : "Failed to delete subscription plan",
+                variant: "destructive"
+            });
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -65,7 +116,9 @@ export function Admin() {
             return;
         }
 
-        setIsCreating(true);
+        const isEditMode = !!editingPlan;
+        isEditMode ? setIsEditing(true) : setIsCreating(true);
+
         try {
             const planData = {
                 name: formData.name,
@@ -77,34 +130,37 @@ export function Admin() {
                 planType: formData.planType
             };
 
-            await createSubscriptionPlan(planData);
+            if (isEditMode) {
+                await editSubscriptionPlan(editingPlan._id, planData);
+                toast({
+                    title: "Success",
+                    description: "Subscription plan updated successfully"
+                });
+            } else {
+                await createSubscriptionPlan(planData);
+                toast({
+                    title: "Success",
+                    description: "Subscription plan created successfully"
+                });
+            }
 
-            toast({
-                title: "Success",
-                description: "Subscription plan created successfully"
-            });
-
-            // Reset form and reload plans
-            setFormData({
-                name: '',
-                description: '',
-                price: '',
-                interval: 'month',
-                currency: 'usd',
-                features: '',
-                planType: 'monthly'
-            });
+            resetForm();
             setShowCreateForm(false);
             await loadPlans();
         } catch (error) {
             toast({
                 title: "Error",
-                description: error instanceof Error ? error.message : "Failed to create subscription plan",
+                description: error instanceof Error ? error.message : `Failed to ${isEditMode ? 'update' : 'create'} subscription plan`,
                 variant: "destructive"
             });
         } finally {
-            setIsCreating(false);
+            isEditMode ? setIsEditing(false) : setIsCreating(false);
         }
+    };
+
+    const handleCancel = () => {
+        resetForm();
+        setShowCreateForm(false);
     };
 
     if (isLoading) {
@@ -126,7 +182,10 @@ export function Admin() {
                     <p className="text-gray-600 mt-1">Manage subscription plans and system settings</p>
                 </div>
                 <Button
-                    onClick={() => setShowCreateForm(!showCreateForm)}
+                    onClick={() => {
+                        resetForm();
+                        setShowCreateForm(!showCreateForm);
+                    }}
                     className="bg-blue-600 hover:bg-blue-700"
                 >
                     <Plus className="mr-2 h-4 w-4" />
@@ -137,7 +196,9 @@ export function Admin() {
             {showCreateForm && (
                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
                     <CardHeader>
-                        <CardTitle className="text-xl text-gray-800">Create New Subscription Plan</CardTitle>
+                        <CardTitle className="text-xl text-gray-800">
+                            {editingPlan ? 'Edit Subscription Plan' : 'Create New Subscription Plan'}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
@@ -182,7 +243,7 @@ export function Admin() {
 
                                 <div className="space-y-2">
                                     <Label htmlFor="planType">Plan Type</Label>
-                                    <Select value={formData.planType} onValueChange={(value) => handleInputChange('planType', value)}>
+                                    <Select value={formData.planType} disabled={editingPlan} onValueChange={(value) => handleInputChange('planType', value)}>
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
@@ -220,22 +281,22 @@ export function Admin() {
                             <div className="flex gap-2">
                                 <Button
                                     type="submit"
-                                    disabled={isCreating}
+                                    disabled={isCreating || isEditing}
                                     className="bg-blue-600 hover:bg-blue-700"
                                 >
-                                    {isCreating ? (
+                                    {isCreating || isEditing ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Creating...
+                                            {editingPlan ? 'Updating...' : 'Creating...'}
                                         </>
                                     ) : (
-                                        'Create Plan'
+                                        editingPlan ? 'Update Plan' : 'Create Plan'
                                     )}
                                 </Button>
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => setShowCreateForm(false)}
+                                    onClick={handleCancel}
                                 >
                                     Cancel
                                 </Button>
@@ -277,9 +338,9 @@ export function Admin() {
                                                 <span>•</span>
                                                 <span>{plan.planType}</span>
                                                 <span>•</span>
-                                                <span>Stripe ID: {plan.stripePriceId}</span>
+                                                <span className='break-all'>Stripe ID: {plan.stripePriceId}</span>
                                             </div>
-                                            <div className="space-y-1">
+                                            <div className="space-y-1 mb-4">
                                                 <p className="text-sm font-medium text-gray-700">Features:</p>
                                                 <ul className="text-sm text-gray-600 space-y-1">
                                                     {plan.features.map((feature: string, index: number) => (
@@ -289,6 +350,30 @@ export function Admin() {
                                                         </li>
                                                     ))}
                                                 </ul>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    onClick={() => handleEdit(plan)}
+                                                    variant="outline"
+                                                    className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                                                >
+                                                    <Edit2 className="mr-2 h-4 w-4" />
+                                                    Edit Plan
+                                                </Button>
+                                                <Button
+                                                    onClick={() => handleDelete(plan._id)}
+                                                    disabled={isDeleting}
+                                                    variant="destructive"
+                                                >
+                                                    {isDeleting ? (
+                                                        <>
+                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                            Deleting...
+                                                        </>
+                                                    ) : (
+                                                        'Delete Plan'
+                                                    )}
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>

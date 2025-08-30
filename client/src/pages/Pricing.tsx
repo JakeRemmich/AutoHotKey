@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 export function Pricing() {
   const [plans, setPlans] = useState([]);
-  const [userUsage, setUserUsage] = useState(null);
+  const [userUsage, setUserUsage] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
@@ -113,7 +113,7 @@ export function Pricing() {
   };
 
   // Sort plans: per-script first, then monthly
-  const sortedPlans = [...plans].sort((a, b) => {
+  const sortedPlans = [...plans].sort((a: any, b: any) => {
     if (a.planType === 'per-script' && b.planType === 'monthly') return -1;
     if (a.planType === 'monthly' && b.planType === 'per-script') return 1;
     return 0;
@@ -132,7 +132,7 @@ export function Pricing() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        {allPlans.map((plan: any, index: number) => {
+        {allPlans.map((plan: any) => {
           const isFree = plan._id === 'free';
           const isPerScript = plan.planType === 'per-script';
           const isMonthly = plan.planType === 'monthly';

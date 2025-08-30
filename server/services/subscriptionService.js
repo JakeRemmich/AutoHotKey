@@ -147,7 +147,7 @@ class SubscriptionService {
           interval: planData.interval,
           currency: planData.currency,
           features: planData.features,
-          planType: planData.planType,
+          // planType: planData.planType,
           stripeProductId,
           stripePriceId,
           updatedAt: new Date()

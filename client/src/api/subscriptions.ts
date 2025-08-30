@@ -9,7 +9,7 @@ export const getSubscriptionPlans = async () => {
     const response = await api.get('/api/subscription-plans');
 
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error?.response?.data?.message || error.message);
   }
 };
@@ -30,7 +30,32 @@ export const createSubscriptionPlan = async (planData: {
   try {
     const response = await api.post('/api/subscription-plans', planData);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message || error.message);
+  }
+};
+export const editSubscriptionPlan = async (id: string, planData: {
+  name: string;
+  description: string;
+  price: number;
+  interval: string;
+  currency?: string;
+  features: string[];
+  planType: string;
+}) => {
+  try {
+    const response = await api.patch(`/api/subscription-plans/${id}`, planData);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message || error.message);
+  }
+};
+
+export const deleteSubscriptionPlan = async (planId: string) => {
+  try {
+    const response = await api.delete(`/api/subscription-plans/${planId}`);
+    return response.data;
+  } catch (error: any) {
     throw new Error(error?.response?.data?.message || error.message);
   }
 };
@@ -47,7 +72,7 @@ export const createCheckoutSession = async (data: {
   try {
     const response = await api.post('/api/checkout-sessions', data);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error?.response?.data?.message || error.message);
   }
 };
@@ -60,7 +85,7 @@ export const getSubscriptionStatus = async () => {
   try {
     const response = await api.get('/api/subscriptions/status');
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error?.response?.data?.message || error.message);
   }
 };
@@ -73,7 +98,7 @@ export const cancelSubscription = async () => {
   try {
     const response = await api.post('/api/subscriptions/cancel');
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error?.response?.data?.message || error.message);
   }
 };

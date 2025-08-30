@@ -81,7 +81,7 @@ router.post('/generate', requireUser, async (req, res) => {
     if (!isAdmin) {
       if (user.subscription_plan === 'free' && user.scripts_generated_count >= 3) {
         console.log(`LIMIT REACHED: Free user ${userId} (${user.email}) has reached limit`);
-        return res.status(403).json({
+        return res.status(400).json({
           success: false,
           error: 'You have reached your free plan limit. Please upgrade to continue generating scripts.'
         });
@@ -102,7 +102,7 @@ router.post('/generate', requireUser, async (req, res) => {
         console.log(`User after revert - plan: ${revertResult.subscription_plan}, credits: ${revertResult.credits}`);
         console.log(`=== END CREDITS EXHAUSTED LOGIC ===`);
 
-        return res.status(403).json({
+        return res.status(400).json({
           success: false,
           error: 'You have used all your script credits. Please purchase more scripts or upgrade to unlimited plan.'
         });
