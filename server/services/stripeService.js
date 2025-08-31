@@ -83,13 +83,14 @@ class StripeService {
     }
   }
 
-  async createCheckoutSession(planId, priceId, customerId, successUrl, cancelUrl, planType = 'monthly') {
+  async createCheckoutSession(planId, priceId, customerId, successUrl, cancelUrl, planType = 'monthly', discountCoupon = null) {
     try {
       console.log(`Creating checkout session for price: ${priceId}, customer: ${customerId}`);
 
       if (!this.stripe) {
         throw new Error('Stripe is not configured');
       }
+
 
       const sessionData = {
         customer: customerId,
@@ -106,6 +107,12 @@ class StripeService {
           planId
         }
       };
+
+      if (discountCoupon) {
+        sessionData.discounts = [{
+          coupon: discountCoupon
+        }];
+      }
 
       const session = await this.stripe.checkout.sessions.create(sessionData);
 
@@ -217,6 +224,31 @@ class StripeService {
       throw error;
     }
   }
+
+
+  async getOrCreateDiscountCoupon(couponId, percentOff) {
+    try {
+      // Try to get existing coupon
+      try {
+        const existingCoupon = await this.stripe.coupons.retrieve(couponId);
+        return existingCoupon.id;
+      } catch (error) {
+        // Coupon doesn't exist, create it
+        const coupon = await this.stripe.coupons.create({
+          id: couponId,
+          percent_off: percentOff,
+          duration: 'once', // Apply discount once
+          name: `${percentOff}% Off Sale`
+        });
+        return coupon.id;
+      }
+    } catch (error) {
+      console.error(`Error creating discount coupon: ${error.message}`);
+      throw error;
+    }
+  }
+
+
 
 
 }

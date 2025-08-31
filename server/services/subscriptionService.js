@@ -193,6 +193,36 @@ class SubscriptionService {
     }
   }
 
+  async createPromotion(planId, promotionData) {
+    try {
+      console.log(`Creating promotion for plan: ${planId}`);
+
+      const { salePrice, saleStartDate, saleEndDate } = promotionData;
+
+      // Update the subscription plan with promotion details
+      const updatedPlan = await SubscriptionPlan.findByIdAndUpdate(
+        planId,
+        {
+          salePrice,
+          saleStartDate,
+          saleEndDate,
+          onSale: true
+        },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedPlan) {
+        throw new Error('Subscription plan not found');
+      }
+
+      console.log(`Successfully created promotion for plan: ${planId}`);
+      return updatedPlan;
+    } catch (error) {
+      console.error(`Error creating promotion: ${error.message}`);
+      throw error;
+    }
+  }
+
   // Check if plan has active subscriptions
   async checkActiveSubscriptions(planId) {
     try {
@@ -235,43 +265,55 @@ class SubscriptionService {
         throw new Error('Subscription plan not found');
       }
 
-      // Check if we have a valid Stripe customer ID for current mode
+      // Check if promotion is currently active
+      const currentDate = new Date();
+      const isOnSale = plan.onSale &&
+        plan.saleStartDate <= currentDate &&
+        plan.saleEndDate > currentDate;
+
+      // Customer handling code...
       let customerId = user.stripeCustomerId;
       let needsNewCustomer = false;
 
       if (customerId) {
         try {
-          // Try to retrieve the customer to see if it exists in current mode
-          console.log(`Checking if customer ${customerId} exists in current Stripe mode`);
           await stripeService.stripe.customers.retrieve(customerId);
-          console.log(`Customer ${customerId} exists in current mode`);
         } catch (error) {
-          console.log(`Customer ${customerId} does not exist in current mode: ${error.message}`);
           needsNewCustomer = true;
         }
       } else {
         needsNewCustomer = true;
       }
 
-      // Create new customer if needed
       if (needsNewCustomer) {
-        console.log(`Creating new Stripe customer for user: ${userId}`);
         const customer = await stripeService.createCustomer(user.email);
         customerId = customer.id;
-
-        // Update user with new Stripe customer ID
         await User.findByIdAndUpdate(userId, { stripeCustomerId: customerId });
-        console.log(`Updated user ${userId} with new customer ID: ${customerId}`);
       }
 
-      // Create checkout session
+      // Prepare checkout session options
+      let discountCoupon = null;
+
+      if (isOnSale) {
+        // Calculate discount percentage
+        const discountPercent = Math.round(((plan.price - plan.salePrice) / plan.price) * 100);
+
+        // Create or get existing coupon for this discount
+        discountCoupon = await stripeService.getOrCreateDiscountCoupon(
+          `sale-${discountPercent}`,
+          discountPercent
+        );
+      }
+
+      // Create checkout session with optional discount
       const session = await stripeService.createCheckoutSession(
         planId,
         plan.stripePriceId,
         customerId,
         successUrl,
         cancelUrl,
-        plan.planType
+        plan.planType,
+        discountCoupon // Pass discount coupon if on sale
       );
 
       console.log(`Successfully created checkout session for user: ${userId}`);
@@ -373,6 +415,37 @@ class SubscriptionService {
       return subscriptionDetails;
     } catch (error) {
       console.error(`Error getting subscription status: ${error.message}`);
+      throw error;
+    }
+  }
+
+
+  async expirePromotions() {
+    try {
+      console.log('Expiring promotions that have ended');
+
+      const currentDate = new Date();
+
+      // Find all plans that are on sale but have passed their end date
+      const expiredPromotions = await SubscriptionPlan.updateMany(
+        {
+          onSale: true,
+          saleEndDate: { $lt: currentDate }
+        },
+        {
+          $set: {
+            onSale: false,
+            salePrice: null,
+            saleStartDate: null,
+            saleEndDate: null
+          }
+        }
+      );
+
+      console.log(`Expired ${expiredPromotions.modifiedCount} promotions`);
+      return expiredPromotions;
+    } catch (error) {
+      console.error(`Error expiring promotions: ${error.message}`);
       throw error;
     }
   }

@@ -112,6 +112,7 @@ router.patch('/subscription-plans/:id', requireAdmin, async (req, res) => {
     });
   }
 });
+
 router.delete('/subscription-plans/:id', requireAdmin, async (req, res) => {
   try {
     console.log('Deleting subscription plan');
@@ -146,6 +147,67 @@ router.delete('/subscription-plans/:id', requireAdmin, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to delete subscription plan',
+      error: error.message
+    });
+  }
+});
+router.post('/subscription-plans/promotion/:id', requireAdmin, async (req, res) => {
+  try {
+    console.log('Creating promotion for plan:', req.params.id);
+    const { id } = req.params;
+    const { salePrice, saleStartDate, saleEndDate } = req.body;
+
+    // Validate required fields
+    if (!salePrice || !saleStartDate || !saleEndDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: salePrice, saleStartDate, saleEndDate'
+      });
+    }
+
+    // Validate the plan exists
+    const existingPlan = await subscriptionService.getSubscriptionPlanById(id);
+    if (!existingPlan) {
+      return res.status(404).json({
+        success: false,
+        message: 'Subscription plan not found'
+      });
+    }
+
+    // Validate dates
+    const startDate = new Date(saleStartDate);
+    const endDate = new Date(saleEndDate);
+
+    if (endDate <= startDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'End date must be after start date'
+      });
+    }
+
+    if (salePrice >= existingPlan.price) {
+      return res.status(400).json({
+        success: false,
+        message: 'Sale price must be less than original price'
+      });
+    }
+
+    // Create promotion
+    await subscriptionService.createPromotion(id, {
+      salePrice: parseFloat(salePrice),
+      saleStartDate: startDate,
+      saleEndDate: endDate
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Promotion created successfully'
+    });
+  } catch (error) {
+    console.error(`Error creating promotion: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to create promotion',
       error: error.message
     });
   }

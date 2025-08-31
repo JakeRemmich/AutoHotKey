@@ -48,7 +48,24 @@ const subscriptionPlanSchema = new mongoose.Schema({
     required: true,
     enum: ['monthly', 'per-script'],
     default: 'monthly'
+  },
+  salePrice: {
+    type: Number,
+    default: null
+  },
+  onSale: {
+    type: Boolean,
+    default: false
+  },
+  saleStartDate: {
+    type: Date,
+    default: null
+  },
+  saleEndDate: {
+    type: Date,
+    default: null
   }
+
 }, {
   timestamps: true
 });

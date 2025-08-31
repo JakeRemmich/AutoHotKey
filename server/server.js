@@ -11,6 +11,8 @@ const scriptRoutes = require("./routes/scriptRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const { connectDB } = require("./config/database");
 const cors = require("cors");
+const cron = require('node-cron');
+const subscriptionService = require("./services/subscriptionService");
 
 if (!process.env.MONGODB_URI) {
   console.error("Error: DATABASE_URL variables in .env missing.");
@@ -41,6 +43,11 @@ connectDB();
 app.on("error", (error) => {
   console.error(`Server error: ${error.message}`);
   console.error(error.stack);
+});
+
+cron.schedule('0 * * * *', async () => {
+  console.log('Checking for expired promotions...');
+  await subscriptionService.expirePromotions();
 });
 
 // Basic Routes
