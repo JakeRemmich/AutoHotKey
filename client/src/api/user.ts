@@ -10,7 +10,7 @@ export const getUserUsage = async () => {
     console.log(response);
 
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error?.response?.data?.message || error.message);
   }
 };
@@ -41,7 +41,7 @@ export const createCheckoutSession = async (data: { planType: 'monthly' | 'per-s
     });
 
     return { url: result.data.url };
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error?.response?.data?.message || error.message);
   }
 };

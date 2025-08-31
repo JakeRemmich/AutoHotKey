@@ -50,6 +50,18 @@ export const editSubscriptionPlan = async (id: string, planData: {
     throw new Error(error?.response?.data?.message || error.message);
   }
 };
+export const createPromotion = async (id: string, planData: {
+  salePrice: string,
+  saleStartDate: string,
+  saleEndDate: string,
+}) => {
+  try {
+    const response = await api.post(`/api/subscription-plans/promotion/${id}`, planData);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message || error.message);
+  }
+};
 
 export const deleteSubscriptionPlan = async (planId: string) => {
   try {

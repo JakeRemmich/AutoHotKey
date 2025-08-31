@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Loader2, Crown, Zap, Edit2 } from 'lucide-react';
 import { getSubscriptionPlans, createSubscriptionPlan, deleteSubscriptionPlan, editSubscriptionPlan } from '@/api/subscriptions';
 import { useToast } from '@/hooks/useToast';
+import CreatePromotion from '@/components/CreatePromotion';
 
 export function Admin() {
     const [plans, setPlans] = useState([]);
@@ -18,6 +19,7 @@ export function Admin() {
     const [isEditing, setIsEditing] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [editingPlan, setEditingPlan] = useState<any>(null);
+    const [openPlanId, setOpenPlanId] = useState<string | null>(null);
     const { toast } = useToast();
 
     const [formData, setFormData] = useState({
@@ -163,6 +165,8 @@ export function Admin() {
         setShowCreateForm(false);
     };
 
+    const handleOpen = (planId: string) => setOpenPlanId(planId);
+    const handleClose = () => setOpenPlanId(null);
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[400px] py-12 xl:py-16 px-6 md:px-12">
@@ -352,6 +356,22 @@ export function Admin() {
                                                 </ul>
                                             </div>
                                             <div className="flex gap-2">
+                                                <Button variant="outline"
+                                                    className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                                                    onClick={() => handleOpen(plan._id)}
+                                                    disabled={plan.onSale}
+                                                >
+                                                    {plan.onSale ? "On Promotion" : "Create Promotion"}
+                                                </Button>
+
+                                                {openPlanId === plan._id && (
+                                                    <CreatePromotion
+                                                        planId={plan._id}
+                                                        open={openPlanId === plan._id}
+                                                        onClose={handleClose}
+                                                        onOpen={(val) => setOpenPlanId(val ? plan._id : null)}
+                                                    />
+                                                )}
                                                 <Button
                                                     onClick={() => handleEdit(plan)}
                                                     variant="outline"
@@ -360,6 +380,7 @@ export function Admin() {
                                                     <Edit2 className="mr-2 h-4 w-4" />
                                                     Edit Plan
                                                 </Button>
+
                                                 <Button
                                                     onClick={() => handleDelete(plan._id)}
                                                     disabled={isDeleting}

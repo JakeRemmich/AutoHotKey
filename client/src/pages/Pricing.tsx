@@ -8,6 +8,7 @@ import { getUserUsage } from '@/api/user';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/useToast';
 import { useNavigate } from 'react-router-dom';
+import clsx from 'clsx';
 
 export function Pricing() {
   const [plans, setPlans] = useState([]);
@@ -20,7 +21,8 @@ export function Pricing() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [isAuthenticated]); // run again when auth state changes
+
 
   const loadData = async () => {
     try {
@@ -28,12 +30,9 @@ export function Pricing() {
         getSubscriptionPlans(),
         isAuthenticated ? getUserUsage() : Promise.resolve(null)
       ]);
-      console.log(usageResult, plansResult);
 
       setPlans(plansResult.data);
       if (usageResult) {
-        console.log(usageResult);
-
         setUserUsage(usageResult);
       }
     } catch (error) {
@@ -46,6 +45,7 @@ export function Pricing() {
       setIsLoading(false);
     }
   };
+
 
   const handleSubscribe = async (planId: string) => {
     if (!isAuthenticated) {
@@ -75,7 +75,6 @@ export function Pricing() {
   };
 
   const isCurrentPlan = (planType: string) => {
-    console.log(userUsage, planType);
     if (!userUsage) return false;
 
     return userUsage.subscription_plan === planType;
@@ -121,7 +120,12 @@ export function Pricing() {
 
   // Combine free plan with sorted paid plans
   const allPlans = [freePlan, ...sortedPlans];
-
+  function discountPercent(original: number, sale: number, decimals = 2) {
+    if (original <= 0) return 0;                // avoid divide-by-zero
+    if (sale >= original) return 0;             // no discount (or negative)
+    const pct = ((original - sale) / original) * 100;
+    return parseFloat(pct.toFixed(decimals));   // e.g., 28.57
+  }
   return (
     <div className="space-y-8  py-12 xl:py-16">
       <div className="text-center">
@@ -137,7 +141,6 @@ export function Pricing() {
           const isPerScript = plan.planType === 'per-script';
           const isMonthly = plan.planType === 'monthly';
           const isUserCurrentPlan = isFree ? isFreePlan() : isCurrentPlan(plan.planType);
-          console.log(isCurrentPlan(plan.planType));
 
           return (
             <Card
@@ -152,6 +155,11 @@ export function Pricing() {
               {isMonthly && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <Badge className="bg-blue-600 text-white px-3 py-1">Most Popular</Badge>
+                </div>
+              )}
+              {plan.onSale && (
+                <div className="absolute -top-3 right-1/2 transform -translate-x-[80px]">
+                  <Badge className="bg-red-600 text-white px-3 py-1">{discountPercent(plan.price, plan.salePrice, 0)}% off</Badge>
                 </div>
               )}
 
@@ -175,14 +183,23 @@ export function Pricing() {
 
                 <CardTitle className="text-2xl text-gray-800 mb-2">{plan.name}</CardTitle>
 
-                <div className="text-4xl font-bold mb-2">
+                <div className=" font-bold mb-2">
                   <span className={
-                    isMonthly ? 'text-blue-600' :
-                      isPerScript ? 'text-green-600' :
-                        'text-gray-600'
+                    clsx(
+                      isMonthly ? 'text-blue-600' :
+                        isPerScript ? 'text-green-600' :
+                          'text-gray-600', `${plan.onSale ? 'text-xl line-through' : 'text-4xl'}`)
                   }>
                     ${plan.price}
                   </span>
+                  {plan.onSale && <span className={clsx(
+                    isMonthly ? 'text-blue-600' :
+                      isPerScript ? 'text-green-600' :
+                        'text-gray-600', 'ml-3 text-4xl')
+                  }>
+                    ${plan.salePrice}
+                  </span>}
+
                   <span className="text-lg text-gray-500 font-normal">
                     {isFree ? '' : `/${plan.interval === 'one_time' ? 'script' : plan.interval}`}
                   </span>
@@ -248,6 +265,6 @@ export function Pricing() {
           </a>
         </p>
       </div>
-    </div>
+    </div >
   );
 }
