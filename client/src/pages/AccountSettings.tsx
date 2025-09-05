@@ -74,7 +74,10 @@ export function AccountSettings() {
         return 'default';
       case 'canceled':
         return 'secondary';
+      case 'canceling':
+        return 'destructive';
       case 'past_due':
+        return 'destructive';
       case 'unpaid':
         return 'destructive';
       default:

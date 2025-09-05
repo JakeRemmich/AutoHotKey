@@ -406,12 +406,24 @@ router.post('/stripe-webhook', async (req, res) => {
               endDate = null;
             }
           }
-          if (userWithSub.subscription_plan_id)
+          if (updatedSubscription.cancel_at_period_end === true) {
+            console.log(`Subscription ${updatedSubscription.id} is set to cancel at period end`);
+            // Keep current plan but mark as canceling
+            await subscriptionService.updateUserSubscription(userWithSub._id, {
+              planType: userWithSub.subscription_plan, // Keep current plan
+              status: 'canceling', // Mark as canceling
+              endDate: endDate
+            });
+            console.log(`Updated subscription to canceling status for user ${userWithSub._id}`);
+          } else {
+            // Normal subscription update (not being canceled)
             await subscriptionService.updateUserSubscription(userWithSub._id, {
               planType: 'monthly',
               status: updatedSubscription.status,
               endDate: endDate
             });
+            console.log(`Updated subscription status for user ${userWithSub._id}: ${updatedSubscription.status}`);
+          }
           console.log(`Updated subscription status for user ${userWithSub._id}: ${updatedSubscription.status}`);
         }
         break;
@@ -422,15 +434,19 @@ router.post('/stripe-webhook', async (req, res) => {
 
         const userWithDeletedSub = await User.findOne({ stripeSubscriptionId: deletedSubscription.id });
         if (userWithDeletedSub) {
+          // Only now actually downgrade the user to free plan
           await subscriptionService.updateUserSubscription(userWithDeletedSub._id, {
             planType: 'free',
             status: 'canceled',
-            endDate: null
+            endDate: null,
+            stripeSubscriptionId: null, // Clear the subscription ID
+            subscription_plan_id: null // Clear the plan ID
           });
 
-          console.log(`Canceled subscription for user ${userWithDeletedSub._id}`);
+          console.log(`Subscription expired and user ${userWithDeletedSub._id} downgraded to free plan`);
         }
         break;
+
 
       default:
         console.log(`Unhandled event type: ${event.type}`);
@@ -481,19 +497,32 @@ router.post('/subscriptions/cancel', requireUser, async (req, res) => {
     }
 
     const stripeService = require('../services/stripeService');
+
+    // Get the subscription details before canceling to get the end date
+    const subscription = await stripeService.getSubscription(user.stripeSubscriptionId);
+
+    // Cancel the subscription at period end
     await stripeService.cancelSubscription(user.stripeSubscriptionId);
 
-    // Update user subscription status
+    // Calculate the end date from the subscription
+    let endDate = null;
+    if (subscription.current_period_end && typeof subscription.current_period_end === 'number') {
+      endDate = new Date(subscription.current_period_end * 1000);
+      console.log(`Subscription will end on: ${endDate}`);
+    }
+
+    // Update user subscription status but KEEP the current plan until it expires
     await subscriptionService.updateUserSubscription(req.user._id, {
-      planType: 'free',
-      status: 'canceled',
-      endDate: null,
-      subscription_plan_id: null
+      planType: user.subscription_plan, // Keep current plan
+      status: 'canceling', // Mark as canceling instead of canceled
+      endDate: endDate, // Set the actual end date
+      subscription_plan_id: user.subscription_plan_id // Keep current plan ID
     });
 
     return res.status(200).json({
       success: true,
-      message: 'Subscription canceled successfully'
+      message: 'Subscription will be canceled at the end of your current billing period',
+      endDate: endDate
     });
   } catch (error) {
     console.error(`Error canceling subscription: ${error.message}`);
@@ -504,5 +533,6 @@ router.post('/subscriptions/cancel', requireUser, async (req, res) => {
     });
   }
 });
+
 
 module.exports = router;

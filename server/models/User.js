@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
   },
   subscriptionStatus: {
     type: String,
-    enum: ['active', 'canceled', 'past_due', 'unpaid', 'incomplete']
+    enum: ['active', 'canceled', 'past_due', 'unpaid', 'incomplete', 'canceling']
   },
   subscriptionEndDate: {
     type: Date,

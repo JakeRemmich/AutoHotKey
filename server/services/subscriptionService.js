@@ -323,7 +323,6 @@ class SubscriptionService {
       throw error;
     }
   }
-
   async updateUserSubscription(userId, subscriptionData) {
     try {
       console.log(`=== UPDATING USER SUBSCRIPTION ===`);
@@ -336,12 +335,17 @@ class SubscriptionService {
 
       const updateData = {
         subscription_plan: subscriptionData.planType,
-        subscription_plan_id: subscriptionData.subscription_plan_id,
         subscriptionStatus: subscriptionData.status,
         subscriptionEndDate: subscriptionData.endDate
       };
 
-      if (subscriptionData.stripeSubscriptionId) {
+      // Only update subscription_plan_id if provided
+      if (subscriptionData.subscription_plan_id !== undefined) {
+        updateData.subscription_plan_id = subscriptionData.subscription_plan_id;
+      }
+
+      // Only update stripeSubscriptionId if provided
+      if (subscriptionData.stripeSubscriptionId !== undefined) {
         updateData.stripeSubscriptionId = subscriptionData.stripeSubscriptionId;
       }
 
@@ -359,6 +363,14 @@ class SubscriptionService {
           console.log(`Adding default 1 credit to existing ${currentUser.credits || 0} credits for user ${userId}`);
           console.log(`Total credits will be: ${updateData.credits}`);
         }
+      } else if (subscriptionData.planType === 'free') {
+        // Only reset credits when actually downgrading to free (not when canceling)
+        if (subscriptionData.status === 'canceled' && !subscriptionData.endDate) {
+          // This is an actual downgrade to free plan
+          updateData.credits = 3; // Reset to free tier credits
+          console.log(`Downgrading to free plan - setting credits to 3 for user ${userId}`);
+        }
+        // If there's an endDate, it means they're still in their paid period
       } else if (subscriptionData.credits !== undefined) {
         // For other plan types, set credits as specified
         updateData.credits = subscriptionData.credits;
@@ -372,7 +384,6 @@ class SubscriptionService {
       if (!user) {
         throw new Error(`User ${userId} not found during update`);
       }
-      console.log(user);
 
       console.log(`User after update - plan: ${user.subscription_plan}, credits: ${user.credits}, status: ${user.subscriptionStatus}`);
       console.log(`Successfully updated subscription for user: ${userId}`);
@@ -384,7 +395,6 @@ class SubscriptionService {
       throw error;
     }
   }
-
   async getUserSubscriptionStatus(userId) {
     try {
       console.log(`Getting subscription status for user: ${userId}`);
