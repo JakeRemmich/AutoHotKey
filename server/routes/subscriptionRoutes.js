@@ -406,13 +406,12 @@ router.post('/stripe-webhook', async (req, res) => {
               endDate = null;
             }
           }
-
-          await subscriptionService.updateUserSubscription(userWithSub._id, {
-            planType: 'monthly',
-            status: updatedSubscription.status,
-            endDate: endDate
-          });
-
+          if (userWithSub.subscription_plan_id)
+            await subscriptionService.updateUserSubscription(userWithSub._id, {
+              planType: 'monthly',
+              status: updatedSubscription.status,
+              endDate: endDate
+            });
           console.log(`Updated subscription status for user ${userWithSub._id}: ${updatedSubscription.status}`);
         }
         break;
@@ -452,6 +451,7 @@ router.get('/subscriptions/status', requireUser, async (req, res) => {
     console.log(`Getting subscription status for user: ${req.user._id}`);
 
     const subscriptionStatus = await subscriptionService.getUserSubscriptionStatus(req.user._id);
+    console.log(subscriptionStatus);
 
     return res.status(200).json({
       success: true,
@@ -487,7 +487,8 @@ router.post('/subscriptions/cancel', requireUser, async (req, res) => {
     await subscriptionService.updateUserSubscription(req.user._id, {
       planType: 'free',
       status: 'canceled',
-      endDate: null
+      endDate: null,
+      subscription_plan_id: null
     });
 
     return res.status(200).json({

@@ -372,6 +372,7 @@ class SubscriptionService {
       if (!user) {
         throw new Error(`User ${userId} not found during update`);
       }
+      console.log(user);
 
       console.log(`User after update - plan: ${user.subscription_plan}, credits: ${user.credits}, status: ${user.subscriptionStatus}`);
       console.log(`Successfully updated subscription for user: ${userId}`);

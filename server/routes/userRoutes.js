@@ -10,6 +10,7 @@ router.get('/', requireUser, async (req, res) => {
     console.log(`Getting user information for user ID: ${req.user._id}`);
 
     const user = await UserService.get(req.user._id);
+    console.log("user in /api/user", user);
 
     if (!user) {
       console.error(`User not found with ID: ${req.user._id}`);

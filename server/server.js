@@ -1,9 +1,6 @@
 // Load environment variables
 require("dotenv").config();
-const mongoose = require("mongoose");
 const express = require("express");
-const session = require("express-session");
-const MongoStore = require('connect-mongo');
 const basicRoutes = require("./routes/index");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -13,6 +10,7 @@ const { connectDB } = require("./config/database");
 const cors = require("cors");
 const cron = require('node-cron');
 const subscriptionService = require("./services/subscriptionService");
+const morgan = require("morgan");
 
 if (!process.env.MONGODB_URI) {
   console.error("Error: DATABASE_URL variables in .env missing.");
@@ -29,7 +27,9 @@ app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true,
 }));
-// IMPORTANT: Webhook route must be defined BEFORE express.json() middleware
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("tiny"));
+}// IMPORTANT: Webhook route must be defined BEFORE express.json() middleware
 // because Stripe webhooks need raw body for signature verification
 app.use('/api/stripe-webhook', express.raw({ type: 'application/json' }), require('./routes/subscriptionRoutes'));
 
