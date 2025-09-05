@@ -46,9 +46,15 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <div className="border-t flex justify-between border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <p> Contact us at:{" "}
+            <a href="mailto:contact@autohotkeygenerator.com?subject=Support%20Request&body=Hello,%0D%0A%0D%0AI%20need%20help%20with...">
+              contact@autohotkeygenerator.com
+            </a>
+          </p>
           <p>&copy; 2025 AutoHotkey Generator. All rights reserved.</p>
         </div>
+
       </div>
     </footer>
   )
