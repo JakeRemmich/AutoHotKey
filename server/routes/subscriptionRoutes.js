@@ -4,6 +4,28 @@ const subscriptionService = require('../services/subscriptionService');
 
 const router = express.Router();
 
+
+// In your routes file (e.g., routes/index.js or routes/subscriptions.js)
+router.get('/cron/expire-promotions', async (req, res) => {
+  // Security check
+  if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    console.log('Checking for expired promotions...');
+    const result = await subscriptionService.expirePromotions();
+
+    res.status(200).json({
+      success: true,
+      message: `Expired ${result.modifiedCount} promotions`
+    });
+  } catch (error) {
+    console.error('Cron job failed:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET /api/subscription-plans - Get all active subscription plans
 router.get('/subscription-plans', async (req, res) => {
   try {

@@ -8,8 +8,7 @@ const scriptRoutes = require("./routes/scriptRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const { connectDB } = require("./config/database");
 const cors = require("cors");
-const cron = require('node-cron');
-const subscriptionService = require("./services/subscriptionService");
+// const cron = require('node-cron');
 const morgan = require("morgan");
 
 if (!process.env.MONGODB_URI) {
@@ -45,10 +44,10 @@ app.on("error", (error) => {
   console.error(error.stack);
 });
 
-cron.schedule('0 * * * *', async () => {
-  console.log('Checking for expired promotions...');
-  await subscriptionService.expirePromotions();
-});
+// cron.schedule('0 * * * *', async () => {
+//   console.log('Checking for expired promotions...');
+//   await subscriptionService.expirePromotions();
+// });
 
 // Basic Routes
 app.use(basicRoutes);
@@ -60,6 +59,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/scripts', scriptRoutes);
 // Subscription Routes (excluding webhook which is handled above)
 app.use('/api', subscriptionRoutes);
+
 
 // If no routes handled the request, it's a 404
 app.use((req, res, next) => {
