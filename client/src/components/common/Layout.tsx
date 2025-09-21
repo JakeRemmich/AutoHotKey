@@ -1,14 +1,18 @@
 import React from "react"
 import { Header } from "./Header"
 import { Footer } from "./Footer"
+import { useLocation } from "react-router-dom"
+import PromotionBanner from "../PromotionBanner"
 
 interface LayoutProps {
   children: React.ReactNode
 }
 
 export function Layout({ children }: LayoutProps) {
+  const location = useLocation()
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    < div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50" >
+      {location.pathname === '/' && <PromotionBanner />}
       <Header />
       <div className="flex">
         <main className="flex-1">
@@ -18,6 +22,6 @@ export function Layout({ children }: LayoutProps) {
         </main>
       </div>
       <Footer />
-    </div>
+    </div >
   )
 }
